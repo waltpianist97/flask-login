@@ -108,6 +108,12 @@ def trip_details(trip_id):
     trip = Trip.query.get(trip_id)
     return render_template("trip_details.html",trip=trip)
 
+
+@app.route("/championship_details/<int:championship_id>")
+def championship_details(championship_id):
+    championship = Championship.query.get(championship_id)
+    return render_template("championship_details.html",championship=championship)
+
 @app.route('/new_championship',methods=['GET', 'POST'])
 @login_required
 def new_championship():
@@ -133,3 +139,25 @@ def admin_page():
     if not current_user.is_admin:
         return 'Unauthorized'
     return render_template('admin_page.html',title="Admin page")
+
+@app.route('/enroll_to_championship/<int:championship_id>',methods=['GET', 'POST'])
+@login_required
+def enroll_to_championship(championship_id):
+    
+    championship = Championship.query.get(championship_id)
+    if current_user not in championship.users:
+        championship.users.append(current_user)
+        db.session.commit()
+
+    return redirect(url_for("user",username=current_user.username))
+
+@app.route('/unenroll_from_championship/<int:championship_id>',methods=['GET', 'POST'])
+@login_required
+def unenroll_from_championship(championship_id):
+    
+    championship = Championship.query.get(championship_id)
+
+    if current_user in championship.users:
+        championship.users.remove(current_user)
+        db.session.commit()
+    return redirect(url_for("user",username=current_user.username))

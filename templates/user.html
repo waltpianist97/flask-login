@@ -66,6 +66,25 @@
             margin: 4px 2px;
             cursor: pointer;
         }
+
+        .unenroll-button-container {
+            margin-top: 10px;
+            margin-left: 10px;
+            /* add left margin to the delete button container */
+        }
+
+        .unenroll-button {
+            background-color: red;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
     </style>
 
 </head>
@@ -101,12 +120,20 @@
     <div class="post-container">
         <div class="post-info">
             <div class="row">
-                <ul>&#128205;{{championship.name}}
-
+                <ul>&#128205;
+                    <a
+                        href="{{url_for('championship_details',championship_id=championship.id)}}">{{championship.name}}</a>
                 </ul>
+                {% if current_user not in championship.users %}
                 <div class="enroll-button-container">
-                    <a class="enroll-button" href="/enroll/{{ championship.id }}">Enroll</a>
+                    <a class="enroll-button" href="/enroll_to_championship/{{championship.id}}">Enroll</a>
                 </div>
+                {% endif %}
+                {% if current_user in championship.users %}
+                <div class="unenroll-button-container">
+                    <a class="unenroll-button" href="/unenroll_from_championship/{{championship.id}}">Unenroll</a>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
