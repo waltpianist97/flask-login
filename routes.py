@@ -2,8 +2,8 @@ from app import app, db
 from flask import request, render_template, flash, redirect,url_for
 from flask_login import current_user, login_user, logout_user,login_required
 
-from models import User,Trip
-from forms import RegistrationForm,LoginForm, NewTripForm
+from models import *
+from forms import *
 
 from werkzeug.urls import url_parse
 import urllib
@@ -66,10 +66,13 @@ def user(username):
     
     user = User.query.filter_by(username=current_user.username).first()
     trips = Trip.query.filter_by(user_id=current_user.id)
+    championships = Championship.query.all()
     if trips is None:
         trips = []
+    if trips is None:
+        championships = []
 
-    return render_template('user.html', user=user,trips=trips)
+    return render_template('user.html', user=user,trips=trips,championships=championships)
 
 
 @app.route('/')
@@ -83,14 +86,38 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route("/delete/<int:trip_id>")
-def delete(trip_id):
+@app.route("/delete_trip/<int:trip_id>")
+def delete_trip(trip_id):
     trip = Trip.query.filter_by(id=trip_id).first()
     db.session.delete(trip)
     db.session.commit()
     return redirect(url_for("user",username=current_user.username))
 
+@app.route("/delete_championship/<int:championship_id>")
+def delete_championship(championship_id):
+    championship = Championship.query.filter_by(id=championship_id).first()
+    db.session.delete(championship)
+    db.session.commit()
+    return redirect(url_for("user",username=current_user.username))
+
+
 @app.route("/trip_details/<int:trip_id>")
 def trip_details(trip_id):
     trip = Trip.query.get(trip_id)
     return render_template("trip_details.html",trip=trip)
+
+@app.route('/new_championship',methods=['GET', 'POST'])
+@login_required
+def new_championship():
+    
+    form = NewChampionshipForm()
+    if form.validate_on_submit():
+        championship = Championship(name=form.name.data,start_date=form.start_date.data,
+                    end_date=form.end_date.data,description=form.description.data)
+       
+        db.session.add(championship)
+        db.session.commit()
+        flash('New champioship registered!')
+        return redirect(url_for('user',username = current_user.username))
+
+    return render_template('new_championship.html',title="Add new championship", form = form )

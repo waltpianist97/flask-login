@@ -47,6 +47,25 @@
             margin: 4px 2px;
             cursor: pointer;
         }
+
+        .enroll-button-container {
+            margin-top: 10px;
+            margin-left: 10px;
+            /* add left margin to the delete button container */
+        }
+
+        .enroll-button {
+            background-color: #53b179cb;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
     </style>
 
 </head>
@@ -66,6 +85,27 @@
                 </ul>
                 <div class="delete-button-container">
                     <a class="delete-button" href="/delete/{{ trip.id }}">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<br>
+<center>
+    <h2>List of available championships</h2>
+</center>
+<div class="post-container">
+    {% for championship in championships %}
+    <div class="post-container">
+        <div class="post-info">
+            <div class="row">
+                <ul>&#128205;{{championship.name}}
+
+                </ul>
+                <div class="enroll-button-container">
+                    <a class="enroll-button" href="/enroll/{{ championship.id }}">Enroll</a>
                 </div>
             </div>
         </div>

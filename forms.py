@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField,TextAreaField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
+
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField,TextAreaField,DateField
+from wtforms.validators import InputRequired, DataRequired, Email, EqualTo
 from models import User
 
 CHOICES = [('5', """Il giro che stai registrando è una gara ufficiale o un evento ufficiale di Team (con locandina)?"""),
@@ -30,3 +31,10 @@ class NewTripForm(FlaskForm):
     description = TextAreaField('Description')
     submit = SubmitField('Add trip')
 
+class NewChampionshipForm(FlaskForm):
+    name = StringField('Championship name',validators=[DataRequired()])
+    start_date = DateField('Date', validators=[InputRequired()], format='%Y-%m-%d', render_kw={'placeholder': 'YYYY-MM-DD'})
+    end_date = DateField('End Date',validators=[InputRequired()],format='%Y-%m-%d', render_kw={'placeholder': 'YYYY-MM-DD'})
+    description = TextAreaField('Description')
+    submit = SubmitField('Add Championship')
+format=' %H:%M:%S'
