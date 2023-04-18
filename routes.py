@@ -20,6 +20,8 @@ def login():
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password")
             return redirect(url_for('login'))
+
+
         login_user(user,remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
@@ -121,3 +123,13 @@ def new_championship():
         return redirect(url_for('user',username = current_user.username))
 
     return render_template('new_championship.html',title="Add new championship", form = form )
+
+
+
+@app.route('/admin_page',methods=['GET', 'POST'])
+@login_required
+def admin_page():
+    
+    if not current_user.is_admin:
+        return 'Unauthorized'
+    return render_template('admin_page.html',title="Admin page")

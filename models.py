@@ -12,15 +12,21 @@ championship_user_association = Table('championship_user_association', db.Model.
 )
 
 
-class User(db.Model,UserMixin):
-    id = Column(Integer, primary_key=True)
-    username = Column(String(140))
-    email = Column(String(140))
-    password = Column(String(140))
-    password_hash = Column(String(140))
+class AdminMixin:
+    @property
+    def is_admin(self):
+        return self.role == 'admin'
+
+class User(db.Model,UserMixin,AdminMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(140))
+    email = db.Column(db.String(140))
+    password = db.Column(db.String(140))
+    password_hash = db.Column(db.String(140))
     trips = db.relationship('Trip',backref='user',lazy='dynamic')
     championships = relationship('Championship', secondary=championship_user_association, back_populates='users')
-    
+    role = db.Column(db.String(20), nullable=False, default='user')
+
     def set_password(self,password):
         self.password_hash = generate_password_hash(password)
 
