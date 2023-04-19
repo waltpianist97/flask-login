@@ -68,13 +68,13 @@ def user(username):
     
     user = User.query.filter_by(username=current_user.username).first()
     trips = Trip.query.filter_by(user_id=current_user.id)
-    championships = Championship.query.all()
+    teams = Team.query.all()
     if trips is None:
         trips = []
-    if trips is None:
-        championships = []
+    if teams is None:
+        teams = []
 
-    return render_template('user.html', user=user,trips=trips,championships=championships)
+    return render_template('user.html', user=user,trips=trips,teams=teams)
 
 
 @app.route('/')
@@ -95,10 +95,10 @@ def delete_trip(trip_id):
     db.session.commit()
     return redirect(url_for("user",username=current_user.username))
 
-@app.route("/delete_championship/<int:championship_id>")
-def delete_championship(championship_id):
-    championship = Championship.query.filter_by(id=championship_id).first()
-    db.session.delete(championship)
+@app.route("/delete_team/<int:team_id>")
+def delete_team(team_id):
+    team = Team.query.filter_by(id=team_id).first()
+    db.session.delete(team)
     db.session.commit()
     return redirect(url_for("user",username=current_user.username))
 
@@ -109,26 +109,27 @@ def trip_details(trip_id):
     return render_template("trip_details.html",trip=trip)
 
 
-@app.route("/championship_details/<int:championship_id>")
-def championship_details(championship_id):
-    championship = Championship.query.get(championship_id)
-    return render_template("championship_details.html",championship=championship)
+@app.route("/team_details/<int:team_id>")
+def team_details(team_id):
+    team = Team.query.get(team_id)
+    return render_template("team_details.html",team=team)
 
-@app.route('/new_championship',methods=['GET', 'POST'])
+@app.route('/new_team',methods=['GET', 'POST'])
 @login_required
-def new_championship():
-    
-    form = NewChampionshipForm()
+def new_team():
+    if not current_user.is_admin:
+        return 'Unauthorized'
+
+    form = NewTeamForm()
     if form.validate_on_submit():
-        championship = Championship(name=form.name.data,start_date=form.start_date.data,
-                    end_date=form.end_date.data,description=form.description.data)
+        team = Team(name=form.name.data,description=form.description.data)
        
-        db.session.add(championship)
+        db.session.add(team)
         db.session.commit()
-        flash('New champioship registered!')
+        flash('New team registered!')
         return redirect(url_for('user',username = current_user.username))
 
-    return render_template('new_championship.html',title="Add new championship", form = form )
+    return render_template('new_team.html',title="Add new team", form = form )
 
 
 
@@ -140,24 +141,24 @@ def admin_page():
         return 'Unauthorized'
     return render_template('admin_page.html',title="Admin page")
 
-@app.route('/enroll_to_championship/<int:championship_id>',methods=['GET', 'POST'])
+@app.route('/enroll_to_team/<int:team_id>',methods=['GET', 'POST'])
 @login_required
-def enroll_to_championship(championship_id):
+def enroll_to_team(team_id):
     
-    championship = Championship.query.get(championship_id)
-    if current_user not in championship.users:
-        championship.users.append(current_user)
+    team = Team.query.get(team_id)
+    if current_user not in team.users:
+        team.users.append(current_user)
         db.session.commit()
 
     return redirect(url_for("user",username=current_user.username))
 
-@app.route('/unenroll_from_championship/<int:championship_id>',methods=['GET', 'POST'])
+@app.route('/unenroll_from_team/<int:team_id>',methods=['GET', 'POST'])
 @login_required
-def unenroll_from_championship(championship_id):
+def unenroll_from_team(team_id):
     
-    championship = Championship.query.get(championship_id)
+    team = Team.query.get(team_id)
 
-    if current_user in championship.users:
-        championship.users.remove(current_user)
+    if current_user in team.users:
+        team.users.remove(current_user)
         db.session.commit()
     return redirect(url_for("user",username=current_user.username))

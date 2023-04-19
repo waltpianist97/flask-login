@@ -31,10 +31,7 @@ class NewTripForm(FlaskForm):
     description = TextAreaField('Description')
     submit = SubmitField('Add trip')
 
-class NewChampionshipForm(FlaskForm):
-    name = StringField('Championship name',validators=[DataRequired()])
-    start_date = DateField('Date', validators=[InputRequired()], format='%Y-%m-%d', render_kw={'placeholder': 'YYYY-MM-DD'})
-    end_date = DateField('End Date',validators=[InputRequired()],format='%Y-%m-%d', render_kw={'placeholder': 'YYYY-MM-DD'})
+class NewTeamForm(FlaskForm):
+    name = StringField('Team name',validators=[DataRequired()])
     description = TextAreaField('Description')
-    submit = SubmitField('Add Championship')
-format=' %H:%M:%S'
+    submit = SubmitField('Add Team')

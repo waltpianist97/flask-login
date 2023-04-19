@@ -2,9 +2,9 @@
 
 {% block content %}
 <center>
-    <h1 style="color:red">Participants in championship: {{championship.name}}</h1>
+    <h1 style="color:red">Participants in team: {{team.name}}</h1>
     <div class="post-container">
-        {% for user in championship.users %}
+        {% for user in team.users %}
         <div class="post-container">
             <div class="post-info">
                 <div class="row">

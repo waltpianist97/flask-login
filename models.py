@@ -6,8 +6,8 @@ from flask_login import UserMixin
 from app import db
 
 
-championship_user_association = Table('championship_user_association', db.Model.metadata,
-    Column('championship_id', Integer, ForeignKey('championship.id')),
+team_user_association = Table('team_user_association', db.Model.metadata,
+    Column('team_id', Integer, ForeignKey('team.id')),
     Column('user_id', Integer, ForeignKey('user.id'))
 )
 
@@ -24,7 +24,7 @@ class User(db.Model,UserMixin,AdminMixin):
     password = db.Column(db.String(140))
     password_hash = db.Column(db.String(140))
     trips = db.relationship('Trip',backref='user',lazy='dynamic')
-    championships = relationship('Championship', secondary=championship_user_association, back_populates='users')
+    teams = relationship('Team', secondary=team_user_association, back_populates='users')
     role = db.Column(db.String(20), nullable=False, default='user')
 
     def set_password(self,password):
@@ -45,18 +45,20 @@ class Trip(db.Model):
     prestige = Column(Integer,nullable=False)
     description = Column(String(140))
     recorded_on = Column(DateTime, index=True, default=datetime.utcnow)
+    placement = Column(Integer)
     user_id = Column(Integer, ForeignKey('user.id'))
     score = Column(Float(precision=2),default=0.0)
     def __repr__(self):
         return '<Trip {}>'.format(self.description)
 
-class Championship(db.Model):
+class Team(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(140))
-    start_date = Column(DateTime, index=True, default=datetime.utcnow)
-    end_date = Column(DateTime, index=True, default=datetime.utcnow)
-    users = relationship('User', secondary=championship_user_association, back_populates='championships')
+    users = relationship('User', secondary=team_user_association, back_populates='teams')
     description = Column(String(140))
     
     def __repr__(self):
-        return '<Championship {}>'.format(self.description)
+        return '<Team {}>'.format(self.description)
+
+    def add_member(self, member):
+        self.users.append(member)
