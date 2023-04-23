@@ -20,9 +20,11 @@
                             &#129353;
                             {%endif%}
                             {{ranking["user"]}} {{ranking["total score"]}}
-                            {%if user.role =="team_leader"%}
+                            {%if user.role =="team_leader" and user in team.users%}
                             <div class="unenroll-button-container" style="display: inline">
-                                <a class="unenroll-button" href="/unenroll_from_team/{{team.id}}">Unenroll</a>
+
+                                <a class="unenroll-button"
+                                    href="{{url_for('unenroll_from_team',team_id=team.id,user_id=ranking['user_id'])}}">Unenroll</a>
                             </div>
                             {%endif%}
                         </li>

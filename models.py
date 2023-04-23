@@ -41,6 +41,11 @@ class User(db.Model,UserMixin,AdminMixin):
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
+class RequestsToJoinTeam(db.Model):
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer)
+    team_id = Column(Integer)
+
 class Trip(db.Model):
     id = Column(Integer, primary_key=True)
     tripname = Column(String(140))
