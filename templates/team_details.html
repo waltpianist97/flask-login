@@ -20,8 +20,12 @@
                             &#129353;
                             {%endif%}
                             {{ranking["user"]}} {{ranking["total score"]}}
+                            {%if user.role =="team_leader"%}
+                            <div class="unenroll-button-container" style="display: inline">
+                                <a class="unenroll-button" href="/unenroll_from_team/{{team.id}}">Unenroll</a>
+                            </div>
+                            {%endif%}
                         </li>
-
                     </div>
                 </div>
             </div>

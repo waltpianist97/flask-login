@@ -34,6 +34,9 @@ class User(db.Model,UserMixin,AdminMixin):
 
     def check_password(self,password):
         return check_password_hash(self.password_hash, password)
+    
+    def set_role(self,role):
+        self.role = role
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

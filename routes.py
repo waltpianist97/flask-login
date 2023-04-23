@@ -134,7 +134,7 @@ def team_details(team_id):
         ranking_list.append({"user":user_by_team.username,"total score":tot_score_by_user})
     ranking_list = list(enumerate(sorted(ranking_list, key=lambda x: x['total score'],reverse=True)))
         
-    return render_template("team_details.html",ranking_list=ranking_list,team=team)
+    return render_template("team_details.html",ranking_list=ranking_list,team=team,user=current_user)
 
 @app.route('/new_team',methods=['GET', 'POST'])
 @login_required
@@ -159,9 +159,10 @@ def new_team():
 @login_required
 def admin_page():
     
+    users = User.query.all()
     if not current_user.is_admin:
         return 'Unauthorized'
-    return render_template('admin_page.html',title="Admin page")
+    return render_template('admin_page.html',title="Admin page",users=users)
 
 @app.route('/enroll_to_team/<int:team_id>',methods=['GET', 'POST'])
 @login_required
@@ -184,3 +185,16 @@ def unenroll_from_team(team_id):
         team.users.remove(current_user)
         db.session.commit()
     return redirect(url_for("user_home",username=current_user.username))
+
+
+@app.route("/change_role",methods=['GET', 'POST'])
+@login_required
+def change_role():
+    user_id = request.form.get('user_id')
+    role = request.form.get('role')
+    user = User.query.get(user_id)
+    if role != user.role:
+        user.set_role(role)
+        db.session.commit()
+
+    return redirect(url_for("admin_page", users = User.query.all()))

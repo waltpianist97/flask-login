@@ -55,6 +55,47 @@
     <h1 style="color:red">Welcome back, you are the admin!</h1>
 </center>
 
+<center>
+    <h1 style="color:red">Users list: </h1>
+    <div class="post-container">
+        <ul class="list-unstyled text-justify" style="text-align: justify;">
+            {% for user in users %}
+            {%if user.role != "admin"%}
+            <div class="post-container">
+                <div class="post-info">
+                    <div class="row">
+                        <li>
+                            <!-- change_role.html -->
+                            <form method="POST" action="{{ url_for('change_role') }}">
+                                <input type="hidden" name="user_id" value="{{ user.id }}">
+                                <label for="role">{{user.username}}:</label>
+                                <select name="role" id="role">
+                                    {%if user.role =="user"%}
+                                    <option value="user" selected>User</option>
+                                    {%else%}
+                                    <option value="user">User</option>
+                                    {%endif%}
+                                    {% if user.role=='team_leader' %}
+                                    <option value="team_leader" selected>Team Leader</option>
+                                    {% else %}
+                                    <option value="team_leader">Team Leader</option>
+                                    {%endif%}
+
+                                </select>
+                                <input type="submit" value="Change Role">
+                            </form>
+
+                        </li>
+
+                    </div>
+                </div>
+            </div>
+            {%endif%}
+
+            {% endfor %}
+        </ul>
+    </div>
+</center>
 
 
 {% endblock %}
