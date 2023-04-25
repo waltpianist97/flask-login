@@ -188,7 +188,7 @@ def request_enrollment_to_team(team_id):
         db.session.add(req)
         db.session.commit()
 
-    return redirect(url_for("user_home",username=current_user.username))
+    return redirect(url_for("user_home",username=current_user.username,requests = [req] ))
 
 @app.route('/decide_on_enrollment/<int:request_id>/<accept>',methods=['GET', 'POST'])
 @login_required
