@@ -164,14 +164,15 @@ def new_team():
 
 
 
-@app.route('/admin_page',methods=['GET', 'POST'])
+@app.route('/manage_team',methods=['GET', 'POST'])
 @login_required
-def admin_page():
-    
-    users = User.query.all()
-    if not current_user.is_admin:
-        return 'Unauthorized'
-    return render_template('admin_page.html',title="Admin page",users=users)
+def manage_team():
+    try:
+        team = User.query.filter_by(id=current_user.id).first().teams[0]
+        team_members = team.users
+        return render_template('manage_team.html',title="Manage team",team = team,users=team_members)
+    except:
+        return redirect(url_for('user_home',username = current_user.username))
 
 @app.route('/request_enrollment_to_team/<int:team_id>',methods=['GET', 'POST'])
 @login_required
@@ -218,10 +219,11 @@ def unenroll_from_team(team_id,user_id):
     team =  Team.query.get(team_id)
     user = User.query.get(user_id)
     if current_user in team.users:
+        user.set_role("user")
         team.users.remove(user)
-     
         db.session.commit()
-    return redirect(url_for("user_home",username=current_user.username))
+    
+    return redirect(url_for("manage_team",username=current_user.username))
 
 
 @app.route("/change_role",methods=['GET', 'POST'])
@@ -234,4 +236,4 @@ def change_role():
         user.set_role(role)
         db.session.commit()
 
-    return redirect(url_for("admin_page", users = User.query.all()))
+    return redirect(url_for("manage_team", users = User.query.all()))

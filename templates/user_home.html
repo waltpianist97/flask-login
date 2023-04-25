@@ -130,34 +130,48 @@
                 <div class="delete-button-container">
                     <a class="delete-button" href="/delete_team/{{team.id}}">Delete</a>
                 </div>
-                {%else%}
+                {%endif%}
                 {% if current_user not in team.users %}
+                {% if not requests %}
                 <div class="enroll-button-container">
-                    <a id="enroll-button" class="enroll-button" href="/request_enrollment_to_team/{{team.id}}"
-                        onclick="disableButton()">Request Enrollment</a>
+                    <a id="enroll-button" class="enroll-button"
+                        href="/request_enrollment_to_team/{{team.id}}"></a>Request
+                    Enrollment</a>
                 </div>
+                {%else%}
+                {% for request in requests %}
 
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                <script>
-                    function disableButton() {
-                        var button = document.getElementById("enroll-button");
-                        button.disabled = true;
-                        button.innerHTML = "Enrollment requested";
-                    }
-                </script>
+                {%if current_user.id == request.user_id %}
+                <div class="enroll-button-container" style="display: inline">
 
-                {% endif %}
-                {% if current_user in team.users %}
-                <div class="unenroll-button-container">
-                    <a class="unenroll-button"
-                        href="{{url_for('unenroll_from_team',team_id=team.id,user_id=current_user.id)}}">Unenroll</a>
+                    <a id="enroll-button" class="enroll-button" href="#" disabled></a>Request sent</a>
+                </div>
+                {%else%}
+                <div class="enroll-button-container" style="display: inline">
+
+                    <a id="enroll-button" class="enroll-button"
+                        href="/request_enrollment_to_team/{{team.id}}"></a>Request
+                    Enrollment</a>
                 </div>
                 {% endif %}
-                {% endif %}
+
+                {% endfor %}
+                {%endif%}
             </div>
+
+            {%endif%}
+
+            {% if current_user in team.users %}
+            <div class="unenroll-button-container">
+                <a class="unenroll-button"
+                    href="{{url_for('unenroll_from_team',team_id=team.id,user_id=current_user.id)}}">Unenroll</a>
+            </div>
+            {% endif %}
+
         </div>
     </div>
-    {% endfor %}
+</div>
+{% endfor %}
 </div>
 
 {% if current_user.role =="team_leader" %}
