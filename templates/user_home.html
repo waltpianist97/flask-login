@@ -133,10 +133,9 @@
                 {%endif%}
                 {% if current_user not in team.users %}
                 {% if not requests %}
-                <div class="enroll-button-container">
-                    <a id="enroll-button" class="enroll-button"
-                        href="/request_enrollment_to_team/{{team.id}}"></a>Request
-                    Enrollment</a>
+                <div class="enroll-button-container" style="display: inline">
+                    <a id="enroll-button" class="enroll-button" href="/request_enrollment_to_team/{{team.id}}">Request
+                        Enrollment</a>
                 </div>
                 {%else%}
                 {% for request in requests %}
@@ -144,7 +143,7 @@
                 {%if current_user.id == request.user_id %}
                 <div class="enroll-button-container" style="display: inline">
 
-                    <a id="enroll-button" class="enroll-button" href="#" disabled></a>Request sent</a>
+                    <a id="enroll-button" class="enroll-button" href="#" disabled>Request sent</a>
                 </div>
                 {%else%}
                 <div class="enroll-button-container" style="display: inline">
