@@ -100,6 +100,19 @@ def user_profile():
         return redirect(url_for('user_profile'))
     return render_template('user_profile.html', form=form)
 
+@app.route("/edit_trip/<int:trip_id>", methods=['GET', 'POST'])
+@login_required
+def edit_trip(trip_id):
+    trip = Trip.query.get(trip_id)
+    form = NewTripForm(obj=trip)
+    if form.validate_on_submit():
+        form.populate_obj(trip)
+        trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,int(trip.prestige),trip.n_of_partecipants,[])
+        db.session.commit()
+        flash('Your trip has been updated!', 'success')
+        return redirect(url_for('user_home',username=current_user.username))
+    return render_template('edit_trip.html', form=form,trip_id=trip.id)
+
 @app.route('/')
 def index():
 
