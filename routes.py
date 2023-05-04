@@ -5,7 +5,15 @@ from sqlalchemy import or_
 from models import *
 from forms import *
 from werkzeug.urls import url_parse
+from flask_mail import Mail, Message
 
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'walterbrnrd@gmail.com'
+app.config['MAIL_PASSWORD'] = 'dndyshwmjuqpcylm'
+
+mail = Mail(app)
     
 with app.app_context():
 
@@ -120,6 +128,7 @@ def user_home(username):
     if user.role=="team_leader":
         requests_to_join = RequestsToJoinTeam.query.filter(RequestsToJoinTeam.team_id.in_(user_teams_ids)).all()
         reqs_user_team = [{"id":request_to_join.id,"username":User.query.get(request_to_join.user_id).username,"team":Team.query.get(request_to_join.team_id).name} for request_to_join in requests_to_join] 
+ 
     if reqs_user_team is None:
         reqs_user_team = []
     if trips is None:
@@ -296,7 +305,11 @@ def request_enrollment_to_team(team_id):
     if current_user not in team.users:
         db.session.add(req)
         db.session.commit()
-
+    
+    msg = Message('join team', recipients=['walterbrnrd@gmail.com'])
+    msg.body = 'Request to join your team'
+    msg.html = f'<p>{current_user.username} requested to join team {team.name}. Please authenticate to check the request!</p>'
+    mail.send(msg)
     return redirect(url_for("user_home",username=current_user.username,requests = [req] ))
 
 @app.route('/decide_on_enrollment/<int:request_id>/<accept>',methods=['GET', 'POST'])
