@@ -6,7 +6,6 @@ from models import *
 from forms import *
 from werkzeug.urls import url_parse
 import urllib
-import re
 
     
 with app.app_context():
