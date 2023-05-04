@@ -35,7 +35,8 @@ def login():
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             if user.role !="admin":
-                next_page = url_for('user_home',username = user.username)
+                join_requests = user.join_requests
+                next_page = url_for('user_home',username = user.username,requests_to_join=join_requests)
             else:
                 next_page = url_for('admin_home',username = user.username)
 
@@ -128,7 +129,7 @@ def user_home(username):
         teams = []
 
 
-    return render_template('user_home.html', user=user,trips=trips,teams=teams,requests=reqs_user_team)
+    return render_template('user_home.html', user=user,trips=trips,teams=teams,requests_to_join=reqs_user_team)
 
 
 @app.route('/admin_home/<username>',methods=['GET', 'POST'])
@@ -292,12 +293,12 @@ def request_enrollment_to_team(team_id):
     if user_req:
         return redirect(url_for("user_home",username=current_user.username))
 
-    req = RequestsToJoinTeam(team_id = team_id,user_id = current_user.id)
+    req = RequestsToJoinTeam(team_id = team_id,user_id = current_user.id,status="pending",request_date=datetime.now())
     if current_user not in team.users:
         db.session.add(req)
         db.session.commit()
-
-    return redirect(url_for("user_home",username=current_user.username,requests = [req] ))
+    updated_requests=User.query.get(current_user.id).join_requests
+    return redirect(url_for("user_home",username=current_user.username,requests_to_join = updated_requests ))
 
 @app.route('/decide_on_enrollment/<int:request_id>/<accept>',methods=['GET', 'POST'])
 @login_required

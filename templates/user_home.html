@@ -58,41 +58,41 @@
                 <ul>&#128205;
                     <a href="{{url_for('team_details',team_id=team.id)}}">{{team.name}}</a>
                 </ul>
-
                 {% if current_user not in team.users %}
-                {% if not requests %}
+                {% if not requests_to_join %}
                 <div class="enroll-button-container" style="display: inline">
                     <a id="enroll-button" class="enroll-button" href="/request_enrollment_to_team/{{team.id}}">Request
                         Enrollment</a>
                 </div>
                 {%else%}
-                {% for request in requests %}
+                {% for request in requests_to_join %}
 
-                {%if current_user.id == request.user_id %}
+                {%if request.status == "pending" %}
                 <div class="enroll-button-container" style="display: inline">
 
                     <a id="enroll-button" class="enroll-button" href="#" disabled>Request sent</a>
                 </div>
+                <!--
                 {%else%}
                 <div class="enroll-button-container" style="display: inline">
 
                     <a id="enroll-button" class="enroll-button" href="/request_enrollment_to_team/{{team.id}}">Request
                         Enrollment</a>
                 </div>
+                -->
                 {% endif %}
 
                 {% endfor %}
                 {%endif%}
+                {%endif%}
+                {% if current_user in team.users %}
+                <div class="unenroll-button-container">
+                    <a class="unenroll-button"
+                        href="{{url_for('unenroll_from_team',team_id=team.id,user_id=current_user.id)}}">Unenroll</a>
+                </div>
+                {% endif %}
             </div>
 
-            {%endif%}
-
-            {% if current_user in team.users %}
-            <div class="unenroll-button-container">
-                <a class="unenroll-button"
-                    href="{{url_for('unenroll_from_team',team_id=team.id,user_id=current_user.id)}}">Unenroll</a>
-            </div>
-            {% endif %}
 
         </div>
     </div>
@@ -107,7 +107,7 @@
     <h2>List of requests to join the teams</h2>
 </center>
 <div class="post-container">
-    {% for request in requests %}
+    {% for request in requests_to_join %}
     <div class="post-container">
         <div class="post-info">
             <div class="row">
