@@ -5,7 +5,6 @@ from sqlalchemy import or_
 from models import *
 from forms import *
 from werkzeug.urls import url_parse
-import urllib
 
     
 with app.app_context():
