@@ -292,7 +292,7 @@ def request_enrollment_to_team(team_id):
     if user_req:
         return redirect(url_for("user_home",username=current_user.username))
 
-    req = RequestsToJoinTeam(team_id = team_id,user_id = current_user.id)
+    req = RequestsToJoinTeam(team_id = team_id,user_id = current_user.id,status="pending",request_date=datetime.now())
     if current_user not in team.users:
         db.session.add(req)
         db.session.commit()

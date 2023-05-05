@@ -70,16 +70,8 @@
                 {%if request.status == "pending" %}
                 <div class="enroll-button-container" style="display: inline">
 
-                    <a id="enroll-button" class="enroll-button" href="#" disabled>Request sent</a>
+                    <a id="enroll-button" class="enroll-button" href="#">Request sent</a>
                 </div>
-                <!--
-                {%else%}
-                <div class="enroll-button-container" style="display: inline">
-
-                    <a id="enroll-button" class="enroll-button" href="/request_enrollment_to_team/{{team.id}}">Request
-                        Enrollment</a>
-                </div>
-                -->
                 {% endif %}
 
                 {% endfor %}
