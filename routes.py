@@ -1,7 +1,7 @@
 from app import app, db
 from flask import request, render_template, flash, redirect,url_for
 from flask_login import current_user, login_user, logout_user,login_required
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from models import *
 from forms import *
 from werkzeug.urls import url_parse
@@ -119,7 +119,7 @@ def user_home(username):
     
     if user.role=="team_leader":
         requests_to_join = RequestsToJoinTeam.query.filter(RequestsToJoinTeam.team_id.in_(user_teams_ids)).all()
-        reqs_user_team = [{"id":request_to_join.id,"username":User.query.get(request_to_join.user_id).username,"team":Team.query.get(request_to_join.team_id).name} for request_to_join in requests_to_join] 
+        reqs_user_team = [{"id":request_to_join.id,"username":User.query.get(request_to_join.user_id).username,"team":Team.query.get(request_to_join.team_id).name,"status":request_to_join.status} for request_to_join in requests_to_join] 
     if reqs_user_team is None:
         reqs_user_team = []
     if trips is None:
@@ -324,6 +324,9 @@ def enroll_directly(team_id,user_id):
     user = User.query.get(user_id)
     team = Team.query.get(team_id)
     team.add_member(user)
+    eventual_requests_to_eliminate =  RequestsToJoinTeam.query.filter(and_(RequestsToJoinTeam.user_id==user.id,RequestsToJoinTeam.team_id==team.id)).all()
+    [db.session.delete(req_to_eliminate) for req_to_eliminate in eventual_requests_to_eliminate]
+
     db.session.commit()
 
     
