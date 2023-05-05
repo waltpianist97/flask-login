@@ -5,15 +5,11 @@ from sqlalchemy import or_
 from models import *
 from forms import *
 from werkzeug.urls import url_parse
-from flask_mail import Mail, Message
+import secrets
+from datetime import datetime, timedelta
+import smtplib
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'walterbrnrd@gmail.com'
-app.config['MAIL_PASSWORD'] = 'dndyshwmjuqpcylm'
 
-mail = Mail(app)
     
 with app.app_context():
 
@@ -292,6 +288,23 @@ def manage_team():
             return redirect(url_for('admin_home',username = current_user.username))
 
 
+def send_email_utility(subject,message,sender_email,recipient_email):
+    # connect to SMTP server
+    with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+        smtp.ehlo()
+        smtp.starttls()
+        smtp.ehlo()
+        
+        # log in to SMTP server
+        smtp.login('walterbrnrd@gmail.com', 'dndyshwmjuqpcylm')
+
+        
+        # create email message
+        email_message = f'Subject: {subject}\n\n{message}'
+        
+        # send email
+        smtp.sendmail(sender_email, recipient_email, email_message)
+    
 @app.route('/request_enrollment_to_team/<int:team_id>',methods=['GET', 'POST'])
 @login_required
 def request_enrollment_to_team(team_id):
@@ -306,10 +319,14 @@ def request_enrollment_to_team(team_id):
         db.session.add(req)
         db.session.commit()
     
-    msg = Message('join team', recipients=['walterbrnrd@gmail.com'])
-    msg.body = 'Request to join your team'
-    msg.html = f'<p>{current_user.username} requested to join team {team.name}. Please authenticate to check the request!</p>'
-    mail.send(msg)
+    subject = 'join team'
+    message=f'{current_user.username} requested to join team {team.name}. Please authenticate to check the request!'
+
+    recipient_email=[tl.email for tl in team.users if tl.role=="team_leader"]
+    sender_email = current_user.email
+
+    send_email_utility(subject,message,sender_email,recipient_email)
+
     return redirect(url_for("user_home",username=current_user.username,requests = [req] ))
 
 @app.route('/decide_on_enrollment/<int:request_id>/<accept>',methods=['GET', 'POST'])
