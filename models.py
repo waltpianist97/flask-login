@@ -27,7 +27,7 @@ class User(db.Model,UserMixin,AdminMixin):
     password_hash = Column(String(140))
     phone_number = Column(String(140))
     role = Column(String(20), nullable=False, default='user')
-    trips = relationship('Trip',backref='user',lazy='dynamic')
+    trips = relationship('Trip',backref='user',lazy='dynamic',cascade="all, delete-orphan")
     teams = relationship('Team', secondary=team_user_association, back_populates='users')
     join_requests = relationship("RequestsToJoinTeam", back_populates="user", cascade="all, delete-orphan")
 
@@ -55,7 +55,7 @@ class Trip(db.Model):
     recorded_on = Column(DateTime, index=True, default=datetime.utcnow)
     n_of_partecipants = Column(Integer, nullable=False, default=1)
     placement = Column(Integer)
-    user_id = Column(Integer, ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"))
     score = Column(Integer,default=0)
     
     def __repr__(self):

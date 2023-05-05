@@ -35,8 +35,7 @@ def login():
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             if user.role !="admin":
-                join_requests = user.join_requests
-                next_page = url_for('user_home',username = user.username,requests_to_join=join_requests)
+                next_page = url_for('user_home',username = user.username)
             else:
                 next_page = url_for('admin_home',username = user.username)
 
@@ -293,12 +292,12 @@ def request_enrollment_to_team(team_id):
     if user_req:
         return redirect(url_for("user_home",username=current_user.username))
 
-    req = RequestsToJoinTeam(team_id = team_id,user_id = current_user.id,status="pending",request_date=datetime.now())
+    req = RequestsToJoinTeam(team_id = team_id,user_id = current_user.id)
     if current_user not in team.users:
         db.session.add(req)
         db.session.commit()
-    updated_requests=User.query.get(current_user.id).join_requests
-    return redirect(url_for("user_home",username=current_user.username,requests_to_join = updated_requests ))
+
+    return redirect(url_for("user_home",username=current_user.username,requests = [req] ))
 
 @app.route('/decide_on_enrollment/<int:request_id>/<accept>',methods=['GET', 'POST'])
 @login_required
