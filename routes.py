@@ -115,8 +115,9 @@ def user_home(username):
     trips = Trip.query.filter_by(user_id=current_user.id).all()
     team = Team.query.first()
     message = ""
-    if user in team.users and RequestsToJoinTeam.query.filter_by(team_id = team.id).all():
-        message = "You have some pending enrollment requests, check out the team page!"
+    if team:
+        if user in team.users and RequestsToJoinTeam.query.filter_by(team_id = team.id).all():
+            message = "You have some pending enrollment requests, check out the team page!"
 
     if trips is None:
         trips = []
@@ -235,6 +236,8 @@ def team_details(team_id):
     users_by_team = team.users
     ranking_list = []
     requests_to_join = []
+    requests_to_join_tl = []
+
     for user_by_team in users_by_team:
         all_scores_by_user = Trip.query.filter_by(user_id=user_by_team.id).all()
         tot_score_by_user =sum([score_by_user.score for score_by_user in all_scores_by_user])
@@ -244,14 +247,12 @@ def team_details(team_id):
     if current_user.role =="user":
         if current_user not in users_by_team:
             requests_to_join = RequestsToJoinTeam.query.filter(and_(RequestsToJoinTeam.user_id==current_user.id, RequestsToJoinTeam.team_id == team_id)).first()
-            return render_template("team_details.html",ranking_list=ranking_list,team=team,user=current_user, requests_to_join=requests_to_join)
 
     if current_user.role =="team_leader":
-        requests_to_join = RequestsToJoinTeam.query.filter_by(team_id=team_id).all()
-        requests_to_join = [{"id":request_to_join.id,"user_id":User.query.get(request_to_join.user_id).id,"username":User.query.get(request_to_join.user_id).username} for request_to_join in requests_to_join] 
-        return render_template("team_details.html",ranking_list=ranking_list,team=team,user=current_user, requests_to_join=requests_to_join)
+        requests_to_join_tl = RequestsToJoinTeam.query.filter_by(team_id=team_id).all()
+        requests_to_join_tl = [{"id":request_to_join.id,"user_id":User.query.get(request_to_join.user_id).id,"username":User.query.get(request_to_join.user_id).username} for request_to_join in requests_to_join_tl] 
    
-    return render_template("team_details.html",ranking_list=ranking_list,team=team,user=current_user, requests_to_join=requests_to_join)
+    return render_template("team_details.html",ranking_list=ranking_list,team=team,user=current_user, requests_to_join=requests_to_join,requests_to_join_tl=requests_to_join_tl)
 
 @app.route('/new_team',methods=['GET', 'POST'])
 @login_required
