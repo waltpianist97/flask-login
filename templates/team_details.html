@@ -2,7 +2,7 @@
 
 {% block content %}
 <center>
-    <h1 style="color:red">Ranking in team: {{team.name}}</h1>
+    <h1 style="color:red">{{team.name}} ranking</h1>
     <div class="post-container">
         <table class="styled-table">
             <thead>
@@ -36,7 +36,7 @@
 
     {%if current_user.role != "admin"%}
     <div class="post-container">
-        <h1 style="color:red">Enrollment status in: {{team.name}}</h1>
+        <h1 style="color:red">Enrollment status in {{team.name}}</h1>
         <table class="styled-table">
             <tbody>
                 <tr>
@@ -75,7 +75,7 @@
 
     <center>
 
-        <h1 style="color:red">List of requests to join the teams</h1>
+        <h1 style="color:red">List of requests to join the team</h1>
     </center>
     <div class="post-container">
         {% for request in requests_to_join %}

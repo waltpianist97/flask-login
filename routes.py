@@ -113,15 +113,18 @@ def user_home(username):
     
     user = User.query.filter_by(username=current_user.username).first()
     trips = Trip.query.filter_by(user_id=current_user.id).all()
-    teams = Team.query.all()
+    team = Team.query.first()
+    message = ""
+    if user in team.users and RequestsToJoinTeam.query.filter_by(team_id = team.id).all():
+        message = "You have some pending enrollment requests, check out the team page!"
 
     if trips is None:
         trips = []
-    if teams is None:
-        teams = []
+    if team is None:
+        team = []
 
 
-    return render_template('user_home.html', user=user,trips=trips,teams=teams)
+    return render_template('user_home.html', user=user,trips=trips,teams=team,new_enrollments=message)
 
 
 @app.route('/admin_home/<username>',methods=['GET', 'POST'])
