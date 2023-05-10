@@ -66,7 +66,7 @@ def login():
             else:
                 next_page = url_for('admin_home',username = user.username)
             
-            return redirect(next_page)
+        return redirect(next_page)
 
                  
     return render_template('login.html', title='Sign In', form=form)
@@ -158,6 +158,7 @@ def register():
 
 
 @app.route('/new_user', methods=['GET', 'POST'])
+@login_required
 def new_user():
 
     form = RegistrationForm()
@@ -279,6 +280,7 @@ def logout():
 
 
 @app.route("/view_user_profile_by_TL/<int:user_id>")
+@login_required
 def view_user_profile_by_TL(user_id):
     user = User.query.get(user_id)
     trips = Trip.query.filter_by(user_id=user_id).all()
@@ -287,6 +289,7 @@ def view_user_profile_by_TL(user_id):
  
 
 @app.route("/delete_trip/<int:trip_id>/<int:user_id>")
+@login_required
 def delete_trip(trip_id,user_id):
     trip = Trip.query.filter_by(id=trip_id).first()
     db.session.delete(trip)
@@ -297,6 +300,7 @@ def delete_trip(trip_id,user_id):
         return redirect(url_for("view_user_profile_by_TL",user_id=user_id))
 
 @app.route("/delete_team/<int:team_id>")
+@login_required
 def delete_team(team_id):
     team = Team.query.filter_by(id=team_id).first()
     db.session.delete(team)
@@ -315,12 +319,14 @@ def delete_user(user_id):
         return redirect(url_for("index"))
     
 @app.route("/trip_details/<int:trip_id>")
+@login_required
 def trip_details(trip_id):
     trip = Trip.query.get(trip_id)
     return render_template("trip_details.html",trip=trip)
 
 
 @app.route("/team_details/<int:team_id>")
+@login_required
 def team_details(team_id):
     team = Team.query.get(team_id)
     users_by_team = team.users
