@@ -1,35 +1,39 @@
 from datetime import datetime
-from sqlalchemy import Table,Integer,Column,String,DateTime,Float,ForeignKey,func, UniqueConstraint
+from sqlalchemy import Table,Integer,Column,String,DateTime,Float,Boolean,ForeignKey,func, UniqueConstraint
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import db
 
-
+"""
 team_user_association = Table('team_user_association', db.Model.metadata,
     Column('team_id', Integer, ForeignKey('team.id')),
     Column('user_id', Integer, ForeignKey('user.id'))
 )
-
+"""
 
 
 class AdminMixin:
     @property
     def is_admin(self):
-        return self.role == 'admin'
+        return self._is_admin == True
 
 class User(db.Model,UserMixin,AdminMixin):
     id = Column(Integer, primary_key=True)
     username = Column(String(140))
+    name = Column(String(140))
+    surname = Column(String(140))
     email = Column(String(140))
     strava_account = Column(String(140))
     password = Column(String(140))
     password_hash = Column(String(140))
     phone_number = Column(String(140))
-    role = Column(String(20), nullable=False, default='user')
     trips = relationship('Trip',backref='user',lazy='dynamic',cascade="all, delete-orphan")
-    teams = relationship('Team', secondary=team_user_association, back_populates='users')
+    members = relationship('TeamUserAssociation', back_populates="user", cascade="all, delete-orphan")
     join_requests = relationship("RequestsToJoinTeam", back_populates="user", cascade="all, delete-orphan")
+    _is_admin = Column(Boolean,nullable=True)
+  
+
 
     def set_password(self,password):
         self.password_hash = generate_password_hash(password)
@@ -56,8 +60,10 @@ class Trip(db.Model):
     n_of_partecipants = Column(Integer, nullable=False, default=1)
     placement = Column(Integer)
     user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"))
+    team_id = Column(Integer, ForeignKey('team.id', ondelete="CASCADE"))
     score = Column(Integer,default=0)
-    
+    is_approved = Column(Boolean,default=False)
+
     def __repr__(self):
         return '<Trip {}>'.format(self.description)
 
@@ -80,7 +86,8 @@ class Trip(db.Model):
 class Team(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(140))
-    users = relationship('User', secondary=team_user_association, back_populates='teams')
+    trips = relationship('Trip',backref='team',lazy='dynamic',cascade="all, delete-orphan")
+    members = relationship('TeamUserAssociation', back_populates='team',cascade="all, delete-orphan")
     join_requests = relationship("RequestsToJoinTeam", back_populates="team", cascade="all, delete-orphan")
     description = Column(String(140))
     
@@ -88,7 +95,7 @@ class Team(db.Model):
         return '<Team {}>'.format(self.description)
 
     def add_member(self, member):
-        self.users.append(member)
+        self.members.append(member)
 
 
 
@@ -103,3 +110,17 @@ class RequestsToJoinTeam(db.Model):
 
     user = relationship("User", back_populates="join_requests")
     team = relationship("Team", back_populates="join_requests")
+
+
+class TeamUserAssociation(db.Model):
+    __tablename__ = 'team_user_association'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'))
+    team_id = Column(Integer, ForeignKey('team.id', ondelete='CASCADE'))
+    role = Column(String(20), nullable=False, default='user')
+    joined_on = Column(DateTime)
+
+    user = relationship("User", back_populates="members")
+    team = relationship("Team", back_populates="members")
+    __table_args__ = (UniqueConstraint('user_id', 'team_id', name='_user_team_uc'),)

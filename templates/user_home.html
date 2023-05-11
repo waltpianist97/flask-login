@@ -48,18 +48,21 @@
 </div>
 <br>
 <center>
-    <h2>Your team:</h2>
+    <h2>Your teams:</h2>
 </center>
+
 <div class="post-container">
+    {%for team in user_teams%}
     <div class="post-container">
         <div class="post-info">
             <div class="row">
                 <ul>&#128205;
-                    <a href="{{url_for('team_details',team_id=teams.id)}}">{{teams.name}}</a>
+                    <a href="{{url_for('team_details',team_id=team.id)}}">{{team.name}}</a>
                 </ul>
             </div>
         </div>
     </div>
+    {%endfor%}
 </div>
 
 {%if current_user.role =="team_leader"%}

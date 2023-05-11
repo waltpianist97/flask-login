@@ -34,14 +34,14 @@
         </table>
     </div>
 
-    {%if current_user.role != "admin"%}
+    {%if not current_user._is_admin%}
     <div class="post-container">
         <h1 style="color:red">Enrollment status in {{team.name}}</h1>
         <table class="styled-table">
             <tbody>
                 <tr>
                     <td>
-                        {%if current_user not in team.users%}
+                        {%if current_user not in team.members%}
                         {%if not requests_to_join%}
                         <form action="{{url_for('request_enrollment_to_team', team_id=team.id)}}" method="POST"
                             class="form-container">
@@ -57,7 +57,7 @@
                         </form>
                         {%endif%}
                         {%endif%}
-                        {%if current_user in team.users%}
+                        {%if current_user in team.members%}
                         <form action="{{url_for('unenroll_from_team', team_id=team.id,user_id=user.id)}}" method="POST"
                             class="form-container">
                             <input type="submit" class="unenroll-button" value="Unenroll">

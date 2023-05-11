@@ -83,7 +83,7 @@
         </div>
     </div>
 </center>
-{% if user in teams.users%}
+{% if user in teams.members%}
 <center>
     <div class="enroll-button-container">
         <a class="enroll-button" href="/new_trip/{{user.id}}">Add new trip</a>
@@ -92,7 +92,7 @@
 {%endif%}
 <center>
 
-    {%if current_user.role =="admin"%}
+    {%if current_user._is_admin%}
     <div style="text-align:center">
         <h1 style="color:red">List of available teams</h1>
     </div>
@@ -104,7 +104,7 @@
                         <a href="{{url_for('team_details',team_id=teams.id)}}">{{teams.name}}</a>
                     </ul>
 
-                    {% if user not in teams.users %}
+                    {% if user not in teams.members %}
                     <div class="enroll-button-container">
                         <a class="enroll-button"
                             href="{{url_for('enroll_directly',team_id=teams.id,user_id=user.id)}}">Enroll</a>
