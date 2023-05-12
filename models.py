@@ -5,12 +5,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import db
 
-"""
-team_user_association = Table('team_user_association', db.Model.metadata,
-    Column('team_id', Integer, ForeignKey('team.id')),
-    Column('user_id', Integer, ForeignKey('user.id'))
-)
-"""
+class TeamUserAssociation(db.Model):
+    __tablename__ = 'team_user_association'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'))
+    team_id = Column(Integer, ForeignKey('team.id', ondelete='CASCADE'))
+    role =Column(String)
+    join_date = Column(DateTime)
+
 
 
 class AdminMixin:
@@ -29,7 +32,7 @@ class User(db.Model,UserMixin,AdminMixin):
     password_hash = Column(String(140))
     phone_number = Column(String(140))
     trips = relationship('Trip',backref='user',lazy='dynamic',cascade="all, delete-orphan")
-    members = relationship('TeamUserAssociation', back_populates="user", cascade="all, delete-orphan")
+    teams = relationship('Team', secondary="team_user_association", back_populates='users')
     join_requests = relationship("RequestsToJoinTeam", back_populates="user", cascade="all, delete-orphan")
     _is_admin = Column(Boolean,nullable=True)
   
@@ -87,15 +90,18 @@ class Team(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(140))
     trips = relationship('Trip',backref='team',lazy='dynamic',cascade="all, delete-orphan")
-    members = relationship('TeamUserAssociation', back_populates='team',cascade="all, delete-orphan")
+    users = relationship('User', secondary="team_user_association", back_populates='teams')
     join_requests = relationship("RequestsToJoinTeam", back_populates="team", cascade="all, delete-orphan")
     description = Column(String(140))
     
     def __repr__(self):
         return '<Team {}>'.format(self.description)
 
-    def add_member(self, member):
-        self.members.append(member)
+    def add_member(self, member:User,role:str,join_date:datetime = None):
+        t_u_association = TeamUserAssociation(team_id=self.id,user_id=member.id,role=role,join_date=join_date)
+        db.session.add(t_u_association)
+        db.session.commit()
+
 
 
 
@@ -112,15 +118,3 @@ class RequestsToJoinTeam(db.Model):
     team = relationship("Team", back_populates="join_requests")
 
 
-class TeamUserAssociation(db.Model):
-    __tablename__ = 'team_user_association'
-
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'))
-    team_id = Column(Integer, ForeignKey('team.id', ondelete='CASCADE'))
-    role = Column(String(20), nullable=False, default='user')
-    joined_on = Column(DateTime)
-
-    user = relationship("User", back_populates="members")
-    team = relationship("Team", back_populates="members")
-    __table_args__ = (UniqueConstraint('user_id', 'team_id', name='_user_team_uc'),)

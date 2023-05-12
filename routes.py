@@ -202,7 +202,7 @@ def user_home(username):
     
     user = User.query.filter_by(username=current_user.username).first()
     #trips = Trip.query.filter_by(user_id=current_user.id).all()
-    user_teams = user.members
+    teams = Team.query.all()
     message = ""
     """if user_teams:
         if user in team.users and RequestsToJoinTeam.query.filter_by(team_id = team.id).all():
@@ -210,11 +210,11 @@ def user_home(username):
     """
     #if trips is None:
     #    trips = []
-    if user_teams is None:
-        user_teams = []
+    if teams is None:
+        teams = []
 
 
-    return render_template('user_home.html', user=user,teams=user_teams,new_enrollments=message)
+    return render_template('user_home.html', user=user,teams=teams,new_enrollments=message)
 
 
 @app.route('/admin_home/<username>',methods=['GET', 'POST'])
@@ -284,7 +284,7 @@ def logout():
 def view_user_profile_by_TL(user_id):
     user = User.query.get(user_id)
     trips = Trip.query.filter_by(user_id=user_id).all()
-    teams= Team.query.first()
+    teams= Team.query.all()
     return render_template("view_user_profile_by_TL.html",user=user,trips=trips,teams=teams)
  
 
@@ -329,7 +329,7 @@ def trip_details(trip_id):
 @login_required
 def team_details(team_id):
     team = Team.query.get(team_id)
-    members_by_team = User.query.filter(User.id.in_([member.user_id for member in team.members])).all()
+    members_by_team = User.query.filter(User.id.in_([member.id for member in team.users])).all()
     ranking_list = []
     requests_to_join = []
     requests_to_join_tl = []
@@ -393,7 +393,7 @@ def request_enrollment_to_team(team_id):
         return redirect(url_for("team_details",team_id=team_id))
 
     req = RequestsToJoinTeam(team_id = team_id,user_id = current_user.id,status="pending",request_date=datetime.now())
-    if current_user not in team.members:
+    if current_user not in team.users:
         db.session.add(req)
         db.session.commit()
 
@@ -418,7 +418,7 @@ def decide_on_enrollment(request_id,accept):
     if accept=="Yes":
         user = User.query.get(request_to_join.user_id)
         team = Team.query.get(request_to_join.team_id)
-        team.add_member(user)
+        team.add_member(user,role="user")
         db.session.delete(request_to_join)
         db.session.commit()
     else:
@@ -434,9 +434,8 @@ def enroll_directly(team_id,user_id):
     
     user = User.query.get(user_id)
     team = Team.query.get(team_id)
-    association = TeamUserAssociation(user=user, team=team, role="user", joined_on=datetime.now())
-    team.add_member(association)
-    db.session.add(association)
+    team.add_member(user,role="user")
+
     db.session.commit()
 
     eventual_requests_to_eliminate =  RequestsToJoinTeam.query.filter(and_(RequestsToJoinTeam.user_id==user.id,RequestsToJoinTeam.team_id==team.id)).all()
@@ -453,9 +452,9 @@ def unenroll_from_team(team_id,user_id):
     
     team =  Team.query.get(team_id)
     user = User.query.get(user_id)
-    if current_user in team.members or user in team.members:
+    if current_user in team.users or user in team.users:
         user.set_role("user")
-        team.members.remove(user)
+        team.users.remove(user)
         db.session.commit()
     
     return redirect(url_for("manage_team",username=current_user.username))

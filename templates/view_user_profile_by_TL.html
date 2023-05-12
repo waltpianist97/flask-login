@@ -22,8 +22,16 @@
                 <tbody>
 
                     <tr>
-                        <td>Name</td>
+                        <td>Username</td>
                         <td>{{ user.username}}</td>
+                    </tr>
+                    <tr>
+                        <td>First name</td>
+                        <td>{{ user.name}}</td>
+                    </tr>
+                    <tr>
+                        <td>Last name</td>
+                        <td>{{ user.surname}}</td>
                     </tr>
                     <tr>
                         <td>Email</td>
@@ -44,52 +52,9 @@
         </div>
     </div>
 
-    <div style="text-align:center">
-        <h1 style="color:red">List of {{user.username}} trips</h1>
-    </div>
 
-    <div style="text-align:center">
-        <div class="post-container" style="margin:0 auto;">
+</center>
 
-            <table class="styled-table">
-                <thead>
-                    <tr>
-                        <th><b>Trip Name</b></th>
-                        <th>Speed [km/h]</th>
-                        <th>Distance [km]</th>
-                        <th>Elevation [m]</th>
-                        <th>Number of partecipants</th>
-                        <th>Prestige</th>
-                        <th>Description</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for trip in trips %}
-                    <tr>
-                        <td>{{trip.tripname}}</td>
-                        <td>{{ trip.speed }} </td>
-                        <td>{{ trip.distance }} </td>
-                        <td>{{trip.elevation}}</td>
-                        <td>{{trip.n_of_partecipants}}</td>
-                        <td>{{trip.prestige}}</td>
-                        <td>{{trip.description}}</td>
-                        <td>{{trip.score}}</td>
-                        <td><a class="delete-button" href="/edit_trip/{{ trip.id }}/{{user.id}}">Edit</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</center>
-{% if user in teams.members%}
-<center>
-    <div class="enroll-button-container">
-        <a class="enroll-button" href="/new_trip/{{user.id}}">Add new trip</a>
-    </div>
-</center>
-{%endif%}
 <center>
 
     {%if current_user._is_admin%}
@@ -99,23 +64,25 @@
     <div class="post-container">
         <div class="post-container">
             <div class="post-info">
+                {%for team in teams%}
                 <div class="row">
                     <ul>&#128205;
-                        <a href="{{url_for('team_details',team_id=teams.id)}}">{{teams.name}}</a>
+                        <a href="{{url_for('team_details',team_id=team.id)}}">{{team.name}}</a>
                     </ul>
 
-                    {% if user not in teams.members %}
+                    {% if user not in team.users %}
                     <div class="enroll-button-container">
                         <a class="enroll-button"
-                            href="{{url_for('enroll_directly',team_id=teams.id,user_id=user.id)}}">Enroll</a>
+                            href="{{url_for('enroll_directly',team_id=team.id,user_id=user.id)}}">Enroll</a>
                     </div>
                     {% else %}
                     <div class="unenroll-button-container">
                         <a class="unenroll-button"
-                            href="{{url_for('unenroll_from_team',team_id=teams.id,user_id=user.id)}}">Unenroll</a>
+                            href="{{url_for('unenroll_from_team',team_id=team.id,user_id=user.id)}}">Unenroll</a>
                     </div>
                     {% endif %}
                 </div>
+                {%endfor%}
             </div>
         </div>
     </div>
