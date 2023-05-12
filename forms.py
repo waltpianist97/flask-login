@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField,TextAreaField,FloatField,IntegerField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField,TextAreaField,FloatField,IntegerField,SelectField
 from wtforms.validators import DataRequired, Email, EqualTo, NumberRange,Length, Regexp
 from models import User
 
@@ -42,12 +42,14 @@ class NewTripForm(FlaskForm):
     tripname = StringField('Trip name',validators=[DataRequired()])
     speed = FloatField('Average speed [km/h]',validators=[DataRequired()])
     distance = FloatField('Distance [km]',validators=[DataRequired()])
+    team = SelectField('Team choice', choices=[])
     elevation = FloatField('Elevation [m]',validators=[DataRequired()])
     prestige = RadioField('Choose an option', choices=CHOICES, validators=[DataRequired()])
     n_of_partecipants = IntegerField('Number of partecipants', validators=[DataRequired(),NumberRange(min=1)])
     description = TextAreaField('Description')
     submit = SubmitField('Add trip')
     submit_save = SubmitField('Save')
+
 
 class NewTeamForm(FlaskForm):
     name = StringField('Team name',validators=[DataRequired()])

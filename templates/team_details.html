@@ -26,14 +26,16 @@
                         {{ place+1 }}
                         {% endif %}
                     </td>
-                    <td>{{ ranking["user"] }}</td>
+                    <td><a
+                            href="{{url_for('member_view', user_id=ranking['user_id'],team_id=team.id)}}">{{ranking["user"]}}</a>
+                    </td>
                     <td>{{ ranking["total score"] }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
+    <!--
     {%if not current_user._is_admin%}
     <div class="post-container">
         <h1 style="color:red">Enrollment status in {{team.name}}</h1>
@@ -70,7 +72,7 @@
 
     </div>
     {%endif%}
-
+   
     {%if current_user.role =="team_leader"%}
 
     <center>
@@ -101,7 +103,7 @@
     </div>
 
     {%endif%}
-
+    -->
 </center>
 
 {% endblock %}

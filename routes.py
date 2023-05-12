@@ -181,9 +181,12 @@ def new_user():
 @login_required
 def new_trip(user_id):
     form = NewTripForm()
+    user = User.query.get(user_id)
+    form.team.choices = [(team.id, team.name) for team in user.teams]
     if form.validate_on_submit():
+
         trip = Trip(tripname=form.tripname.data,speed=form.speed.data,
-                    distance=form.distance.data,elevation=form.elevation.data,
+                    distance=form.distance.data,elevation=form.elevation.data, team_id=form.team.data,
                     prestige = int(form.prestige.data),description=form.description.data,user_id=user_id,n_of_partecipants=form.n_of_partecipants.data)
        
         trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])
@@ -324,6 +327,22 @@ def trip_details(trip_id):
     trip = Trip.query.get(trip_id)
     return render_template("trip_details.html",trip=trip)
 
+@app.route("/member_view/<int:user_id>/<int:team_id>")
+@login_required
+def member_view(user_id,team_id):
+    member = User.query.get(user_id)
+    team = Team.query.get(team_id)
+    if current_user in team.users:
+        my_role_in_team = TeamUserAssociation.query.filter(and_(TeamUserAssociation.user_id==current_user.id,TeamUserAssociation.team_id==team_id)).first().role
+    else:
+        my_role_in_team = None
+        
+    trips_in_team = Trip.query.filter(and_(Trip.user_id==user_id,Trip.team_id==team_id))
+
+    return render_template("member_view.html",trips= trips_in_team,user=member,team=team, role=my_role_in_team)
+
+
+
 
 @app.route("/team_details/<int:team_id>")
 @login_required
@@ -335,7 +354,7 @@ def team_details(team_id):
     requests_to_join_tl = []
 
     for user_by_team in members_by_team:
-        all_scores_by_user = Trip.query.filter_by(user_id=user_by_team.id).all()
+        all_scores_by_user = Trip.query.filter_by(user_id=user_by_team.id,team_id=team_id).all()
         tot_score_by_user =sum([score_by_user.score for score_by_user in all_scores_by_user])
         ranking_list.append({"user_id":user_by_team.id,"user":user_by_team.username,"total score":tot_score_by_user})
     ranking_list = list(enumerate(sorted(ranking_list, key=lambda x: x['total score'],reverse=True)))
@@ -434,7 +453,12 @@ def enroll_directly(team_id,user_id):
     
     user = User.query.get(user_id)
     team = Team.query.get(team_id)
-    team.add_member(user,role="user")
+
+    #if the team has no member, the first joining becomes leader
+    if not team.users: 
+        team.add_member(user,role="team_leader")
+    else:
+        team.add_member(user,role="user")
 
     db.session.commit()
 
