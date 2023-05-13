@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Table,Integer,Column,String,DateTime,Float,Boolean,ForeignKey,func, UniqueConstraint
+from sqlalchemy import Integer,Column,String,DateTime,Float,Boolean,ForeignKey
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -13,7 +13,6 @@ class TeamUserAssociation(db.Model):
     team_id = Column(Integer, ForeignKey('team.id', ondelete='CASCADE'))
     role =Column(String)
     join_date = Column(DateTime)
-
 
 
 class AdminMixin:
@@ -44,9 +43,6 @@ class User(db.Model,UserMixin,AdminMixin):
     def check_password(self,password):
         return check_password_hash(self.password_hash, password)
     
-    def set_role(self,role):
-        self.role = role
-
     def __repr__(self):
         return '<User {}>'.format(self.username)
   
@@ -101,8 +97,6 @@ class Team(db.Model):
         t_u_association = TeamUserAssociation(team_id=self.id,user_id=member.id,role=role,join_date=join_date)
         db.session.add(t_u_association)
         db.session.commit()
-
-
 
 
 class RequestsToJoinTeam(db.Model):

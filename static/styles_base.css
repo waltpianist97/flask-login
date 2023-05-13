@@ -93,6 +93,7 @@ ul {
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+
 }
 
 .unenroll-button-container {
@@ -256,4 +257,10 @@ ul {
     align-items: center;
     height: 100vh;
 
+}
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }

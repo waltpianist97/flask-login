@@ -42,11 +42,12 @@ class NewTripForm(FlaskForm):
     tripname = StringField('Trip name',validators=[DataRequired()])
     speed = FloatField('Average speed [km/h]',validators=[DataRequired()])
     distance = FloatField('Distance [km]',validators=[DataRequired()])
-    team = SelectField('Team choice', choices=[])
+    team = SelectField('Team choice', choices=[],coerce=int)
     elevation = FloatField('Elevation [m]',validators=[DataRequired()])
     prestige = RadioField('Choose an option', choices=CHOICES, validators=[DataRequired()])
     n_of_partecipants = IntegerField('Number of partecipants', validators=[DataRequired(),NumberRange(min=1)])
     description = TextAreaField('Description')
+    is_approved = BooleanField("Approve")
     submit = SubmitField('Add trip')
     submit_save = SubmitField('Save')
 
@@ -57,7 +58,9 @@ class NewTeamForm(FlaskForm):
     submit = SubmitField('Add Team')
 
 class ProfileForm(FlaskForm):
-    username = StringField('Name', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired()])
+    name =  StringField('First Name', validators=[DataRequired()])
+    surname = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     strava_account = StringField('Strava account')
     phone_number = StringField("Phone number")

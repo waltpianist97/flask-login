@@ -98,7 +98,18 @@
                         <td>{{trip.prestige}}</td>
                         <td>{{trip.description}}</td>
                         <td>{{trip.score}}</td>
-                        <td><a class="delete-button" href="/edit_trip/{{ trip.id }}/{{current_user.id}}">Edit</a></td>
+
+                        {%if user in team.users%}
+                        {%if user==current_user%}
+                        <td><a class="delete-button"
+                                href="{{url_for('edit_trip',trip_id=trip.id,user_id=current_user.id)}}">Edit</a></td>
+                        {%endif%}
+                        {%if role=='team_leader' and user!=current_user%}
+                        <td><a class="delete-button"
+                                href="{{url_for('edit_trip',trip_id=trip.id,user_id=user.id)}}">Edit</a></td>
+                        {%endif%}
+                        {%endif%}
+
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -115,7 +126,7 @@
         {%endif%}
         {%if role=='team_leader' and user!=current_user%}
         <a class="blue pull-left" href="{{ url_for('new_trip', user_id = user.id) }}">Add a new trip</a>
-
+        {%endif%}
     </div>
 
     <br>
@@ -125,15 +136,44 @@
             <div class="post-info">
                 <div class="row">
                     <div class="unenroll-button-container">
+                        {%if user==current_user%}
+                        <a class="unenroll-button"
+                            href="{{url_for('unenroll_from_team',team_id=team.id,user_id=current_user.id)}}">Unenroll</a>
+                        {%endif%}
+                        {%if role=='team_leader' and user!=current_user%}
                         <a class="unenroll-button"
                             href="{{url_for('unenroll_from_team',team_id=team.id,user_id=user.id)}}">Unenroll</a>
+                        {%endif%}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    {%endif%}
 
+    {%if role=='team_leader' and user!=current_user%}
+    <div class="post-container">
+        <div class="post-container">
+            <div class="post-info">
+                <form method="POST" action="{{ url_for('change_role',team_id=team.id,user_id=user.id) }}">
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                    <select name="role">
+                        {% if member_role == "user" %}
+                        <option value="user" selected>User</option>
+                        {% else %}
+                        <option value="user">User</option>
+                        {% endif %}
+                        {% if member_role == "team_leader" %}
+                        <option value="team_leader" selected>Team Leader</option>
+                        {% else %}
+                        <option value="team_leader">Team Leader</option>
+                        {% endif %}
+                    </select>
+                    <input type="submit" value="Change Role">
+                </form>
+            </div>
+        </div>
+    </div>
+    {%endif%}
 
 </center>
 {% endblock %}
