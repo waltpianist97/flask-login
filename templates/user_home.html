@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 
 
@@ -36,8 +37,10 @@
 </div>
 <div class="left-sidebar">
 
-    <img src="{{ url_for('static', filename='images/app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
-
+    <div class="popup-btn-container">
+        <img src="{{ url_for('static', filename='images/app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
+        <i class="fas fa-bars menu-symbol"></i>
+    </div>
     <div class="popup" id="popup">
         <ul>
             <li><a href="{{url_for('user_profile')}}">User Profile<a></li>
