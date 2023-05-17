@@ -435,7 +435,7 @@ def team_details(team_id):
     ranking_list = []
     requests_to_join = []
     requests_to_join_tl = []
-
+    my_role_in_team = TeamUserAssociation.query.filter(and_(TeamUserAssociation.user_id==current_user.id,TeamUserAssociation.team_id==team_id)).first().role
     for user_by_team in members_by_team:
         all_scores_by_user = Trip.query.filter_by(user_id=user_by_team.id,team_id=team_id).all()
         tot_score_by_user =sum([score_by_user.score for score_by_user in all_scores_by_user])
@@ -452,7 +452,7 @@ def team_details(team_id):
             requests_to_join_tl = [{"id":request_to_join.id,"user_id":User.query.get(request_to_join.user_id).id,"username":User.query.get(request_to_join.user_id).username} for request_to_join in requests_to_join_tl] 
         
  
-    return render_template("team_details.html",ranking_list=ranking_list,team=team,user=current_user, requests_to_join=requests_to_join,requests_to_join_tl=requests_to_join_tl)
+    return render_template("team_details.html",ranking_list=ranking_list,team=team,user=current_user, requests_to_join=requests_to_join,requests_to_join_tl=requests_to_join_tl,role=my_role_in_team)
 
 @app.route('/new_team',methods=['GET', 'POST'])
 @login_required
@@ -473,18 +473,14 @@ def new_team():
 
 
 
-@app.route('/manage_team',methods=['GET', 'POST'])
+@app.route('/manage_team/<int:team_id>',methods=['GET', 'POST'])
 @login_required
-def manage_team():
-    try:
-        team = User.query.filter_by(id=current_user.id).first().teams[0]
-        team_members = [member for member in team.members if member.id != current_user.id]
-        return render_template('manage_team.html',title="Manage team",team = team,users=team_members)
-    except:
-        if not current_user._is_admin:
-            return redirect(url_for('user_home',username = current_user.username))
-        else:
-            return redirect(url_for('admin_home',username = current_user.username))
+def manage_team(team_id):
+
+    team = Team.query.filter_by(id=team_id).first()
+    team_members = [member for member in team.users if member.id != current_user.id]
+    return render_template('manage_team.html',title="Manage team",team = team,users=team_members)
+
 
  
 @app.route('/request_enrollment_to_team/<int:team_id>',methods=['GET', 'POST'])
@@ -574,7 +570,6 @@ def unenroll_from_team(team_id,user_id):
 @app.route('/change_role/<int:team_id>/<int:user_id>',methods=['GET', 'POST'])
 @login_required
 def change_role(team_id,user_id):
-    user_id = request.form.get('user_id')
     team_name = Team.query.get(team_id).name
     user_mail = User.query.get(user_id).email
     role = request.form.get('role')
