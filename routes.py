@@ -285,6 +285,26 @@ def admin_home(username):
     return render_template('admin_home.html', users=users,trips=trips,teams=teams)
 
 
+@app.route("/team_profile/<int:team_id>", methods=['GET', 'POST'])
+@login_required
+def team_profile(team_id):
+    team = Team.query.get(team_id)
+    form = TeamProfileForm(obj=team)
+    if form.validate_on_submit():
+        # Handle profile picture upload
+        team.name = form.name.data
+        team.description = form.description.data
+        team.team_picture = form.team_picture.data
+
+        if team.team_picture.filename:
+            team.team_picture = team.team_picture.read()
+        else:
+            team.team_picture = None
+
+        db.session.commit()
+        flash('Your team has been updated!', 'success')
+        return redirect(url_for('team_profile',team_id=team.id))
+    return render_template('team_profile.html', form=form)
 
 
 @app.route('/user_profile', methods=['GET', 'POST'])
@@ -433,9 +453,8 @@ def team_details(team_id):
     team = Team.query.get(team_id)
     members_by_team = User.query.filter(User.id.in_([member.id for member in team.users])).all()
     ranking_list = []
-    requests_to_join = []
-    requests_to_join_tl = []
-    my_role_in_team = TeamUserAssociation.query.filter(and_(TeamUserAssociation.user_id==current_user.id,TeamUserAssociation.team_id==team_id)).first().role
+    my_role_in_team = current_user.get_role_in_team(team_id=team_id)
+    my_request_to_join_team = RequestsToJoinTeam.query.filter_by(team_id=team_id,user_id=current_user.id).first()
     for user_by_team in members_by_team:
         all_scores_by_user = Trip.query.filter_by(user_id=user_by_team.id,team_id=team_id).all()
         tot_score_by_user =sum([score_by_user.score for score_by_user in all_scores_by_user])
@@ -443,16 +462,7 @@ def team_details(team_id):
         ranking_list.append({"user_id":user_by_team.id,"user":user_by_team.username,"total score":tot_score_by_user,"role":role_in_team})
     ranking_list = list(enumerate(sorted(ranking_list, key=lambda x: x['total score'],reverse=True)))
 
-    if current_user not in members_by_team:
-            requests_to_join = RequestsToJoinTeam.query.filter(and_(RequestsToJoinTeam.user_id==current_user.id, RequestsToJoinTeam.team_id == team_id)).first()
-    else:
-        am_i_team_leader = (TeamUserAssociation.query.filter_by(user_id=current_user.id,team_id=team_id).first().role == "team_leader")
-        if am_i_team_leader:
-            requests_to_join_tl = RequestsToJoinTeam.query.filter_by(team_id=team_id).all()
-            requests_to_join_tl = [{"id":request_to_join.id,"user_id":User.query.get(request_to_join.user_id).id,"username":User.query.get(request_to_join.user_id).username} for request_to_join in requests_to_join_tl] 
-        
- 
-    return render_template("team_details.html",ranking_list=ranking_list,team=team,user=current_user, requests_to_join=requests_to_join,requests_to_join_tl=requests_to_join_tl,role=my_role_in_team)
+    return render_template("team_details.html",ranking_list=ranking_list,team=team,user=current_user, role=my_role_in_team,request=my_request_to_join_team)
 
 @app.route('/new_team',methods=['GET', 'POST'])
 @login_required
@@ -478,8 +488,14 @@ def new_team():
 def manage_team(team_id):
 
     team = Team.query.filter_by(id=team_id).first()
-    team_members = [member for member in team.users if member.id != current_user.id]
-    return render_template('manage_team.html',title="Manage team",team = team,users=team_members)
+    team_members = [{"user": user, "role": user.get_role_in_team(team_id=team_id)} for user in team.users if user.id != current_user.id]
+ 
+    requests_to_join = RequestsToJoinTeam.query.filter_by(team_id=team_id).all()
+    requests_to_join = [{"id":request_to_join.id,"user":User.query.get(request_to_join.user_id)} for request_to_join in requests_to_join] 
+
+ 
+ 
+    return render_template('manage_team.html',title="Manage team",team = team,team_members=team_members,requests_to_join=requests_to_join)
 
 
  
@@ -525,7 +541,7 @@ def decide_on_enrollment(request_id,accept):
         db.session.delete(request_to_join)
         db.session.commit()
     
-    return redirect(url_for("team_details",team_id = request_to_join.team_id))
+    return redirect(url_for("manage_team",team_id = request_to_join.team_id))
 
 
 @app.route('/enroll_directly/<int:team_id>/<int:user_id>',methods=['GET', 'POST'])
@@ -564,7 +580,7 @@ def unenroll_from_team(team_id,user_id):
         team.users.remove(user)
         db.session.commit()
     
-    return redirect(url_for("manage_team",username=current_user.username))
+    return redirect(url_for("manage_team",team_id=team_id))
 
 
 @app.route('/change_role/<int:team_id>/<int:user_id>',methods=['GET', 'POST'])
@@ -581,4 +597,4 @@ def change_role(team_id,user_id):
     db.session.commit()
    
 
-    return redirect(url_for('member_view',team_id=team_id,user_id=user_id))
+    return redirect(url_for('manage_team',team_id=team_id))

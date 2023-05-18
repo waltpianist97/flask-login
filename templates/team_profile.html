@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles_profile.css') }}">
+
+<center>
+    <h1 style="color:red">Your team</h1>
+    <form class="form-container" method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <table class="profile-table">
+            <tr>
+                <td>{{ form.name.label }}</td>
+                <td>{{ form.name() }}</td>
+            </tr>
+            <tr>
+                <td>{{ form.description.label }}</td>
+                <td>{{ form.description() }}</td>
+            </tr>
+            <tr>
+                <td>
+                    Team Picture:
+                    {% if form.team_picture.data %}
+                    <span>{{ form.team_picture.data.filename }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ form.team_picture() }}</td>
+            </tr>
+
+            <tr>
+
+                <td colspan="2" style="text-align: center;">{{ form.submit }}</td>
+
+            </tr>
+        </table>
+    </form>
+</center>
+
+
+{% endblock %}
