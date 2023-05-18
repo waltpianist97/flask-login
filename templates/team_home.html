@@ -2,10 +2,12 @@
 
 {% block content %}
 <div class="main">
-    <h1 style="color:red; text-align: center;">{{team.name}} ranking</h1>
     <div class="box">
         {%if role%}
         <table class="styled-table">
+            <caption>
+                <h1 style="color:red">{{team.name}} ranking</h1>
+            </caption>
             <thead>
                 <tr>
                     <th>Rank</th>
@@ -28,9 +30,7 @@
                         {% endif %}
                     </td>
                     <td><a href="{{url_for('member_view', user_id=ranking['user_id'],team_id=team.id)}}">
-                            {%if ranking["role"]=="team_leader"%}
-                            &#128081;
-                            {%endif%}
+
                             {{ranking["user"]}}
                             {%if ranking["user"] == current_user.username%}
                             (you)
@@ -90,7 +90,11 @@
 
 <div class="left-sidebar">
     <div class="popup-btn-container">
+        {%if not team.team_picture%}
         <img src="{{ url_for('static', filename='images/app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
+        {%else%}
+        <img src="data:image/png;base64,{{ team.team_picture|b64encode }}" class="popup-btn" alt="Popup Image">
+        {%endif%}
         <i class="fas fa-bars menu-symbol"></i>
     </div>
     <div class="popup" id="popup">
@@ -99,7 +103,7 @@
             <li><a href="{{url_for('manage_team',team_id=team.id)}}">Manage team</a></li>
             {%endif%}
             <li><a href="{{url_for('team_profile',team_id=team.id)}}">Team profile</a></li>
-            <li><a href="{{url_for('team_details',team_id=team.id)}}">Ranking</a></li>
+            <li><a href="{{url_for('team_home',team_id=team.id)}}">Ranking</a></li>
             <li><a href="#">Trips overview</a></li>
         </ul>
     </div>

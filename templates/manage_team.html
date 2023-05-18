@@ -3,14 +3,18 @@
 {% block content %}
 <div class="left-sidebar">
     <div class="popup-btn-container">
+        {%if not team.team_picture%}
         <img src="{{ url_for('static', filename='images/app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
+        {%else%}
+        <img src="data:image/png;base64,{{ team.team_picture|b64encode }}" class="popup-btn" alt="Popup Image">
+        {%endif%}
         <i class="fas fa-bars menu-symbol"></i>
     </div>
     <div class="popup" id="popup">
         <ul>
             <li><a href="{{url_for('manage_team',team_id=team.id)}}">Manage team</a></li>
-
-            <li><a href="{{url_for('team_details',team_id=team.id)}}">Ranking</a></li>
+            <li><a href="{{url_for('team_profile',team_id=team.id)}}">Team profile</a></li>
+            <li><a href="{{url_for('team_home',team_id=team.id)}}">Ranking</a></li>
 
             <li><a href="#">Trips overview</a></li>
         </ul>
@@ -124,5 +128,8 @@
 
 
     </center>
+</div>
+<div class="right-sidebar">
+
 </div>
 {% endblock %}

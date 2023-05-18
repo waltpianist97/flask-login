@@ -288,7 +288,9 @@ def admin_home(username):
 @app.route("/team_profile/<int:team_id>", methods=['GET', 'POST'])
 @login_required
 def team_profile(team_id):
+
     team = Team.query.get(team_id)
+    my_role_in_team = current_user.get_role_in_team(team_id=team_id)
     form = TeamProfileForm(obj=team)
     if form.validate_on_submit():
         # Handle profile picture upload
@@ -303,8 +305,14 @@ def team_profile(team_id):
 
         db.session.commit()
         flash('Your team has been updated!', 'success')
-        return redirect(url_for('team_profile',team_id=team.id))
-    return render_template('team_profile.html', form=form)
+        return redirect(url_for('team_profile',team_id=team_id))
+    
+    # Disable the form fields
+    if my_role_in_team!="team_leader":
+        for field in form:
+            field.render_kw = {'disabled': True}
+    
+    return render_template('team_profile.html', form=form,team=team,role=my_role_in_team)
 
 
 @app.route('/user_profile', methods=['GET', 'POST'])
@@ -447,9 +455,9 @@ def member_view(user_id,team_id):
 
 
 
-@app.route("/team_details/<int:team_id>")
+@app.route("/team_home/<int:team_id>")
 @login_required
-def team_details(team_id):
+def team_home(team_id):
     team = Team.query.get(team_id)
     members_by_team = User.query.filter(User.id.in_([member.id for member in team.users])).all()
     ranking_list = []
@@ -458,11 +466,10 @@ def team_details(team_id):
     for user_by_team in members_by_team:
         all_scores_by_user = Trip.query.filter_by(user_id=user_by_team.id,team_id=team_id).all()
         tot_score_by_user =sum([score_by_user.score for score_by_user in all_scores_by_user])
-        role_in_team = TeamUserAssociation.query.filter_by(user_id=user_by_team.id,team_id=team_id).first().role
-        ranking_list.append({"user_id":user_by_team.id,"user":user_by_team.username,"total score":tot_score_by_user,"role":role_in_team})
+        ranking_list.append({"user_id":user_by_team.id,"user":user_by_team.username,"total score":tot_score_by_user})
     ranking_list = list(enumerate(sorted(ranking_list, key=lambda x: x['total score'],reverse=True)))
 
-    return render_template("team_details.html",ranking_list=ranking_list,team=team,user=current_user, role=my_role_in_team,request=my_request_to_join_team)
+    return render_template("team_home.html",ranking_list=ranking_list,team=team,user=current_user, role=my_role_in_team,request=my_request_to_join_team)
 
 @app.route('/new_team',methods=['GET', 'POST'])
 @login_required
@@ -506,14 +513,14 @@ def request_enrollment_to_team(team_id):
     team = Team.query.get(team_id)
     user_req= RequestsToJoinTeam.query.filter_by(team_id = team_id, user_id = current_user.id).first()
     if user_req:
-        return redirect(url_for("team_details",team_id=team_id))
+        return redirect(url_for("team_home",team_id=team_id))
 
     req = RequestsToJoinTeam(team_id = team_id,user_id = current_user.id,status="pending",request_date=datetime.now())
     if current_user not in team.users:
         db.session.add(req)
         db.session.commit()
 
-        return redirect(url_for("team_details",team_id=team_id,requests_to_join=req))
+        return redirect(url_for("team_home",team_id=team_id,requests_to_join=req))
 
 @app.route('/withdraw_request_enrollment/<int:request_id>/<int:team_id>',methods=['GET', 'POST'])
 @login_required
@@ -523,7 +530,7 @@ def withdraw_request_enrollment(request_id,team_id):
     db.session.delete(request_to_remove)
     db.session.commit()
 
-    return redirect(url_for("team_details",team_id=team_id))
+    return redirect(url_for("team_home",team_id=team_id))
 
 
 @app.route('/decide_on_enrollment/<int:request_id>/<accept>',methods=['GET', 'POST'])

@@ -95,7 +95,7 @@ class Team(db.Model):
     users = relationship('User', secondary="team_user_association", back_populates='teams')
     join_requests = relationship("RequestsToJoinTeam", back_populates="team", cascade="all, delete-orphan")
     description = Column(String(140))
-    
+    team_picture = Column(BLOB)
     def __repr__(self):
         return '<Team {}>'.format(self.description)
 
