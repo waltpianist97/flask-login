@@ -115,15 +115,12 @@ def member_view(user_id,team_id):
     team = Team.query.get(team_id)
     if current_user in team.users:
         my_role_in_team = TeamUserAssociation.query.filter(and_(TeamUserAssociation.user_id==current_user.id,TeamUserAssociation.team_id==team_id)).first().role
-        member_role_in_team = TeamUserAssociation.query.filter(and_(TeamUserAssociation.user_id==member.id,TeamUserAssociation.team_id==team_id)).first().role
-
     else:
         my_role_in_team = None
-        member_role_in_team = None
 
-    trips_in_team = Trip.query.filter(and_(Trip.user_id==user_id,Trip.team_id==team_id))
+    trips_in_team = Trip.query.filter(and_(Trip.user_id==user_id,Trip.team_id==team_id)).all()
 
-    return render_template("member_view.html",trips= trips_in_team,user=member,team=team, role=my_role_in_team,member_role=member_role_in_team)
+    return render_template("member_view.html",trips= trips_in_team,user=member,team=team, role=my_role_in_team)
 
 
 @app.route('/decide_on_enrollment/<int:request_id>/<accept>',methods=['GET', 'POST'])

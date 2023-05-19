@@ -67,24 +67,8 @@ def user_profile():
 def trips_overview(user_id):
     
     user = User.query.filter_by(id=user_id).first()
-    trips_groups = (
-    db.session.query(Team.name, Trip)
-    .join(Trip, Team.id == Trip.team_id)
-    .filter(Trip.user_id == user_id)
-    .all()
-    )
+    result=user.group_user_trips_by_team()
 
-    # Create a list of dictionaries with team.name as key and list of trips as value
-    trips_dict ={}
-    for team_name, trip in trips_groups:
-        if team_name not in trips_dict:
-            trips_dict[team_name] = [trip]
-        else:
-            trips_dict[team_name].append(trip)
-
-    result = []
-    for team_name, trips in trips_dict.items():
-        result.append({"team_name": team_name,"team_id":trips[0].team_id, "trips_by_team": trips})
     return render_template('trips_overview.html', user=user, trips_groups=result)
  
 

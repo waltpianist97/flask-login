@@ -83,7 +83,7 @@ def edit_trip(trip_id,user_id):
 
         db.session.commit()
         flash('Your trip has been updated!', 'success')
-        if user != current_user and my_role_in_team == "team_leader":
+        if user != current_user:
             return redirect(url_for('member_view',team_id=trip.team_id,user_id=trip.user_id))
         else:
             return redirect(url_for('trips_overview',user_id=user.id))
@@ -98,8 +98,11 @@ def delete_trip(trip_id,user_id):
     trip = Trip.query.filter_by(id=trip_id).first()
     db.session.delete(trip)
     db.session.commit()
-    return redirect(url_for('member_view', user_id=user_id,team_id=trip.team_id))
-
+    if user_id == current_user.id:
+        return redirect(url_for('trips_overview',user_id=current_user.id))
+    else:
+        return redirect(url_for('member_view', user_id=user_id,team_id=trip.team_id))
+  
     
 @app.route("/trip_details/<int:trip_id>")
 @login_required
