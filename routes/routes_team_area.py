@@ -42,14 +42,37 @@ def team_profile(team_id):
 def manage_team(team_id):
 
     team = Team.query.filter_by(id=team_id).first()
-    team_members = [{"user": user, "role": user.get_role_in_team(team_id=team_id)} for user in team.users if user.id != current_user.id]
+    team_members = [{"user": user, "role": user.get_role_in_team(team_id=team_id), "team_id":team_id} for user in team.users if user.id != current_user.id]
  
     requests_to_join = RequestsToJoinTeam.query.filter_by(team_id=team_id).all()
     requests_to_join = [{"id":request_to_join.id,"user":User.query.get(request_to_join.user_id)} for request_to_join in requests_to_join] 
 
- 
- 
     return render_template('manage_team.html',title="Manage team",team = team,team_members=team_members,requests_to_join=requests_to_join)
+
+
+@app.route('/manage_trips/<int:team_id>',methods=['GET', 'POST'])
+@login_required
+def manage_trips(team_id):
+    team = Team.query.get(team_id)
+    trips = Trip.query.filter(Trip.team_id==team_id,Trip.user_id!=current_user.id).all()
+    trips = [{"user":trip.get_user(),"trip":trip} for trip in trips]
+    
+    return render_template('manage_trips.html',title="Manage trips",trips = trips,team=team)
+
+@app.route('/approve_trip/<int:trip_id>',methods=["GET","POST"])
+@login_required
+def approve_trip(trip_id):
+    trip = Trip.query.get(trip_id)
+    team = Team.query.get(trip.team_id)
+    trip.is_approved = request.form.get('is_approved') == 'on'
+    if trip.is_approved:    
+        trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])
+    else:
+        trip.score = 0
+        
+    db.session.commit()
+    return redirect(url_for("manage_trips",team_id=team.id))
+  
 
 @app.route('/change_role/<int:team_id>/<int:user_id>',methods=['GET', 'POST'])
 @login_required
