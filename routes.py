@@ -344,12 +344,10 @@ def user_profile():
         user.email = form.email.data
         user.strava_account = form.strava_account.data
         user.phone_number = form.phone_number.data
-        user.profile_picture = form.profile_picture.data
 
-        if user.profile_picture.filename:
-            user.profile_picture = user.profile_picture.read()
-        else:
-            user.profile_picture = None
+        if form.profile_picture.data:
+            user.profile_picture = form.profile_picture.data.read()
+
 
         db.session.commit()
         flash('Your profile has been updated!', 'success')
