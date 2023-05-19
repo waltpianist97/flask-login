@@ -210,6 +210,21 @@ def new_trip(user_id):
 
     return render_template('new_trip.html',title="Add new trip", form = form )
 
+@app.route('/approve_trip/<int:trip_id>',methods=["GET","POST"])
+@login_required
+def approve_trip(trip_id):
+    trip = Trip.query.get(trip_id)
+    team = Team.query.get(trip.team_id)
+    trip.is_approved = request.form.get('is_approved') == 'on'
+    if trip.is_approved:    
+        trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])
+    else:
+        trip.score = 0
+        
+    db.session.commit()
+    return redirect(url_for("manage_trips",team_id=team.id))
+  
+
 @app.route('/user_home/<username>',methods=['GET', 'POST'])
 @login_required
 def user_home(username):
@@ -346,31 +361,27 @@ def user_profile():
 def edit_trip(trip_id,user_id):
     trip = Trip.query.get(trip_id)
     user = User.query.get(user_id)
+    my_role_in_team = user.get_role_in_team(trip.team_id)
     form = NewTripForm(obj=trip)
-    if user == current_user:
-        form.team.choices = [(team.id, team.name) for team in current_user.teams]
-    else:
-        form.team.choices = [(team.id, team.name) for team in user.teams if current_user in team.users]
-    my_role_in_team = TeamUserAssociation.query.filter(and_(TeamUserAssociation.user_id==current_user.id,TeamUserAssociation.team_id==trip.team_id)).first().role
+    if request.method == 'POST':
+        trip.tripname = request.form["tripname"]
+        trip.speed = float(request.form["speed"])
+        trip.distance = float(request.form["distance"])
+        trip.elevation = float(request.form["elevation"])
+        trip.prestige = int(request.form["prestige"])
+        trip.description = request.form["description"]
+        trip.user_id = user_id
+        trip.n_of_partecipants = int(request.form["n_of_partecipants"])
+        trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])
 
-    if form.validate_on_submit():
-        trip.tripname=form.tripname.data
-        trip.speed=form.speed.data
-        trip.distance=form.distance.data
-        trip.elevation=form.elevation.data
-        trip.team_id=form.team.data
-        trip.prestige= int(form.prestige.data)
-        trip.description=form.description.data
-        trip.user_id=user_id
-        trip.n_of_partecipants=form.n_of_partecipants.data
-        trip.is_approved = form.is_approved.data
-        if trip.is_approved:
-            trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])
-        else:
-            trip.score = 0
         db.session.commit()
         flash('Your trip has been updated!', 'success')
-        return redirect(url_for('member_view',team_id=trip.team_id,user_id=trip.user_id))
+        if user != current_user and my_role_in_team == "team_leader":
+            return redirect(url_for('member_view',team_id=trip.team_id,user_id=trip.user_id))
+        else:
+            return redirect(url_for('trips_overview',user_id=user.id))
+
+ 
 
     return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=my_role_in_team,is_approved=trip.is_approved)
 
@@ -408,7 +419,10 @@ def delete_trip(trip_id,user_id):
     trip = Trip.query.filter_by(id=trip_id).first()
     db.session.delete(trip)
     db.session.commit()
-    return redirect(url_for('member_view', user_id=user_id,team_id=trip.team_id))
+    if user_id == current_user.id:
+        return redirect(url_for('trips_overview',user_id=current_user.id))
+    else:
+        return redirect(url_for('member_view', user_id=user_id,team_id=trip.team_id))
   
 
 @app.route("/delete_team/<int:team_id>")
@@ -449,7 +463,7 @@ def member_view(user_id,team_id):
         my_role_in_team = None
         member_role_in_team = None
 
-    trips_in_team = Trip.query.filter(and_(Trip.user_id==user_id,Trip.team_id==team_id))
+    trips_in_team = Trip.query.filter(and_(Trip.user_id==user_id,Trip.team_id==team_id)).all()
 
     return render_template("member_view.html",trips= trips_in_team,user=member,team=team, role=my_role_in_team,member_role=member_role_in_team)
 
@@ -496,7 +510,7 @@ def new_team():
 def manage_team(team_id):
 
     team = Team.query.filter_by(id=team_id).first()
-    team_members = [{"user": user, "role": user.get_role_in_team(team_id=team_id)} for user in team.users if user.id != current_user.id]
+    team_members = [{"user": user, "role": user.get_role_in_team(team_id=team_id), "team_id":team_id} for user in team.users if user.id != current_user.id]
  
     requests_to_join = RequestsToJoinTeam.query.filter_by(team_id=team_id).all()
     requests_to_join = [{"id":request_to_join.id,"user":User.query.get(request_to_join.user_id)} for request_to_join in requests_to_join] 
@@ -504,6 +518,15 @@ def manage_team(team_id):
  
  
     return render_template('manage_team.html',title="Manage team",team = team,team_members=team_members,requests_to_join=requests_to_join)
+
+@app.route('/manage_trips/<int:team_id>',methods=['GET', 'POST'])
+@login_required
+def manage_trips(team_id):
+    team = Team.query.get(team_id)
+    trips = Trip.query.filter(Trip.team_id==team_id,Trip.user_id!=current_user.id).all()
+    trips = [{"user":trip.get_user(),"trip":trip} for trip in trips]
+    
+    return render_template('manage_trips.html',title="Manage trips",trips = trips,team=team)
 
 
  

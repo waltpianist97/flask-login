@@ -12,11 +12,9 @@
     </div>
     <div class="popup" id="popup">
         <ul>
-            <li><a href="{{url_for('manage_team',team_id=team.id)}}">Manage team</a></li>
+            <li><a href="{{url_for('manage_trips',team_id=team.id)}}">Manage trips</a></li>
             <li><a href="{{url_for('team_profile',team_id=team.id)}}">Team profile</a></li>
-            <li><a href="{{url_for('team_home',team_id=team.id)}}">Ranking</a></li>
-
-            <li><a href="#">Trips overview</a></li>
+            <li><a href="{{url_for('team_home',team_id=team.id)}}">Team home</a></li>
         </ul>
     </div>
     <script>
@@ -49,7 +47,8 @@
                 <tbody>
                     {% for team_member in team_members %}
                     <tr>
-                        <td><a href="/view_user_profile_by_TL/{{team_member['user'].id }}">{{
+                        <td><a
+                                href="{{url_for('member_view',user_id = team_member['user'].id, team_id= team_member['team_id'])}}">{{
                                 team_member['user'].username }}</a></td>
                         <td>
                             <form method="POST"

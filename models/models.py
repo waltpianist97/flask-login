@@ -72,6 +72,9 @@ class Trip(db.Model):
     def __repr__(self):
         return '<Trip {}>'.format(self.description)
 
+    def get_user(self):
+        return User.query.get(self.user_id)
+    
     @staticmethod
     def calculate_score(v,dx,dz,pr,np,piazzamenti):
         """dx: distance in km,
