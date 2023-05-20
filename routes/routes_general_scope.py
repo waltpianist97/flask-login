@@ -79,12 +79,17 @@ def edit_trip(trip_id,user_id):
         trip.description = request.form["description"]
         trip.user_id = user_id
         trip.n_of_partecipants = int(request.form["n_of_partecipants"])
-        trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])
-
+        if trip.is_approved:
+            trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])
+        else:
+            trip.score = 0
         db.session.commit()
         flash('Your trip has been updated!', 'success')
         if user != current_user:
-            return redirect(url_for('member_view',team_id=trip.team_id,user_id=trip.user_id))
+            if trip.is_approved:
+                return redirect(url_for('member_view',team_id=trip.team_id,user_id=trip.user_id))
+            else:
+                return redirect(url_for('manage_trips',team_id=trip.team_id))
         else:
             return redirect(url_for('trips_overview',user_id=user.id))
 

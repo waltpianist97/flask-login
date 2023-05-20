@@ -55,21 +55,18 @@ def manage_team(team_id):
 def manage_trips(team_id):
     team = Team.query.get(team_id)
     trips = Trip.query.filter(Trip.team_id==team_id,Trip.user_id!=current_user.id).all()
-    trips = [{"user":trip.get_user(),"trip":trip} for trip in trips]
-    
-    return render_template('manage_trips.html',title="Manage trips",trips = trips,team=team)
+    approved_trips = [{"user":trip.get_user(),"trip":trip, "approval_state":trip.is_approved} for trip in trips if trip.is_approved]
+    non_approved_trips = [{"user":trip.get_user(),"trip":trip, "approval_state":trip.is_approved} for trip in trips if not trip.is_approved]
+
+    return render_template('manage_trips.html',title="Manage trips",approved_trips = approved_trips,non_approved_trips=non_approved_trips,team=team)
 
 @app.route('/approve_trip/<int:trip_id>',methods=["GET","POST"])
 @login_required
 def approve_trip(trip_id):
     trip = Trip.query.get(trip_id)
     team = Team.query.get(trip.team_id)
-    trip.is_approved = request.form.get('is_approved') == 'on'
-    if trip.is_approved:    
-        trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])
-    else:
-        trip.score = 0
-        
+    trip.is_approved=True
+    trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])  
     db.session.commit()
     return redirect(url_for("manage_trips",team_id=team.id))
   
@@ -121,6 +118,28 @@ def member_view(user_id,team_id):
     trips_in_team = Trip.query.filter(and_(Trip.user_id==user_id,Trip.team_id==team_id)).all()
 
     return render_template("member_view.html",trips= trips_in_team,user=member,team=team, role=my_role_in_team)
+
+@app.route("/member_view/<int:user_id>")
+@login_required
+def non_member_view(user_id):
+    non_member = User.query.get(user_id)
+    last_trips = Trip.query.order_by(desc(Trip.recorded_on)).filter_by(user_id = user_id).limit(3).all()
+    if last_trips is None:
+        last_trips = []
+
+    stat={}
+    stat["average_speed"] = db.session.query(Trip, func.avg(Trip.speed)).group_by(Trip.user_id).filter_by(user_id=user_id).all()
+    if stat["average_speed"]:
+        stat["average_speed"] = round(stat["average_speed"][0][1],2)
+    stat["maximum_elevation"] = db.session.query(Trip, func.max(Trip.elevation)).group_by(Trip.user_id).filter_by(user_id=user_id).all()
+    if stat["maximum_elevation"]:
+        stat["maximum_elevation"]= stat["maximum_elevation"][0][1]
+    stat["total_distance"] = db.session.query(Trip, func.sum(Trip.distance)).group_by(Trip.user_id).filter_by(user_id=user_id).all()
+    if stat["total_distance"]:
+        stat["total_distance"]= round(stat["total_distance"][0][1],2)
+    stat["activities"] = len(Trip.query.filter_by(user_id=user_id).all())
+
+    return render_template('non_member_view.html', user=non_member, last_trips=last_trips,stat=stat)
 
 
 @app.route('/decide_on_enrollment/<int:request_id>/<accept>',methods=['GET', 'POST'])
