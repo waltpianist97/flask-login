@@ -13,6 +13,7 @@ class TeamUserAssociation(db.Model):
     team_id = Column(Integer, ForeignKey('team.id', ondelete='CASCADE'))
     role =Column(String)
     join_date = Column(DateTime)
+    current_ranking = Column(Integer)
 
 
 class AdminMixin:
