@@ -48,7 +48,7 @@ class NewTripForm(FlaskForm):
     n_of_partecipants = IntegerField('Number of partecipants', validators=[DataRequired(),NumberRange(min=1)])
     description = TextAreaField('Description')
     is_approved = BooleanField("Approve")
-    num_placements = IntegerField('Number of Placements')
+    num_placements = IntegerField('Number of Placements',default=0)
 
     submit = SubmitField('Add trip')
     submit_save = SubmitField('Save')
