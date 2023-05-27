@@ -81,7 +81,8 @@ class Trip(db.Model):
     score = Column(Integer,default=0)
     is_approved = Column(Boolean,default=False)
     placements = relationship("PlacementsInTrip", backref="trip", cascade="all, delete-orphan")
-
+    n_of_placements = Column(Integer)
+    
     def __repr__(self):
         return '<Trip {}>'.format(self.description)
 
@@ -103,6 +104,9 @@ class Trip(db.Model):
 
         p_f_o = punteggio_finale_o(v,dx,dz,pr)
         return punteggio_finale_f(p_f_o,np,piazzamenti)
+
+    def get_placements(self):
+        return PlacementsInTrip.query.filter_by(trip_id=self.id).all()
 
 class PlacementsInTrip(db.Model):
     id = Column(Integer, primary_key=True)

@@ -42,12 +42,12 @@ def new_trip(user_id):
 
     if form.validate_on_submit():
 
-        trip = Trip(tripname=form.tripname.data,speed=form.speed.data,
+        trip = Trip(tripname=form.tripname.data,speed=form.speed.data, n_of_placements=form.n_of_placements.data,
                     distance=form.distance.data,elevation=form.elevation.data, team_id=form.team.data,
                     prestige = int(form.prestige.data),description=form.description.data,user_id=user_id,n_of_partecipants=form.n_of_partecipants.data)
         
         placement_values=[]
-        for i in range(form.num_placements.data):
+        for i in range(form.n_of_placements.data):
             field_name = f"placement-{i}"
             placement_value = request.form.get(field_name)
             placement_values.append(int(placement_value))
@@ -69,7 +69,7 @@ def new_trip(user_id):
             placement = PlacementsInTrip(trip_id=trip.id, place=placement_value)
             db.session.add(placement)
         db.session.commit()
-        
+
         if user == current_user:
             return redirect(url_for('trips_overview',user_id=user.id))
         else:
@@ -85,10 +85,15 @@ def serve_image(filename):
 @login_required
 def edit_trip(trip_id,user_id):
     trip = Trip.query.get(trip_id)
+    placements = trip.get_placements()
     user = User.query.get(user_id)
     my_role_in_team = user.get_role_in_team(trip.team_id)
     form = NewTripForm(obj=trip)
     if request.method == 'POST':
+
+        [db.session.delete(placement) for placement in placements]
+        db.session.commit()
+
         trip.tripname = request.form["tripname"]
         trip.speed = float(request.form["speed"])
         trip.distance = float(request.form["distance"])
@@ -97,12 +102,33 @@ def edit_trip(trip_id,user_id):
         trip.description = request.form["description"]
         trip.user_id = user_id
         trip.n_of_partecipants = int(request.form["n_of_partecipants"])
+        trip.n_of_placements = int(request.form["n_of_placements"])
+        edit_placements = request.form.getlist('edit_placement')
+        placement_ids = request.form.getlist('placement_id')
+
+        placement_values=[]
+        if edit_placements:
+            for id, place in zip(placement_ids, edit_placements):
+                placement = PlacementsInTrip(id=id, trip_id=trip.id, place=int(place))
+                db.session.add(placement)
+        else:
+            for i in range(form.n_of_placements.data):
+                field_name = f"placement-{i}"
+                placement_value = request.form.get(field_name)
+                placement_values.append(int(placement_value))
+                placement = PlacementsInTrip(trip_id=trip.id, place=placement_value)
+                db.session.add(placement)
+
+        db.session.commit() 
+
         if trip.is_approved:
-            trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])
+            trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,placement_values)
         else:
             trip.score = 0
         db.session.commit()
         flash('Your trip has been updated!', 'success')
+
+       
         if user != current_user:
             if trip.is_approved:
                 return redirect(url_for('member_view',team_id=trip.team_id,user_id=trip.user_id))
@@ -113,7 +139,7 @@ def edit_trip(trip_id,user_id):
 
  
 
-    return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=my_role_in_team,is_approved=trip.is_approved)
+    return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=my_role_in_team,is_approved=trip.is_approved,placements=placements)
 
 @app.route("/delete_trip/<int:trip_id>/<int:user_id>")
 @login_required

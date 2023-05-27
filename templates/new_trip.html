@@ -56,8 +56,8 @@
                         <td>{{ form.description(size=20, rows=5) }}</td>
                     </tr>
                     <tr>
-                        <td>{{form.num_placements.label}}</td>
-                        <td>{{form.num_placements()}}<br>
+                        <td>{{form.n_of_placements.label}}</td>
+                        <td>{{form.n_of_placements()}}<br>
                             <div id="placement-entries"></div>
 
                         </td>
@@ -75,7 +75,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        var numPlacementsField = document.getElementById("num_placements");
+        var numPlacementsField = document.getElementById("n_of_placements");
         var placementEntriesContainer = document.getElementById("placement-entries");
 
         // Add event listener to numPlacementsField
@@ -87,8 +87,6 @@
 
             // Generate new placement entries
             for (var i = 0; i < numPlacements; i++) {
-                var label = document.createElement("label");
-                label.textContent = (i + 1) + ") ";
 
                 var input = document.createElement("input");
                 input.type = "number";
@@ -101,7 +99,6 @@
                 });
 
                 var div = document.createElement("div");
-                div.appendChild(label);
                 div.appendChild(input);
                 div.appendChild(deleteButton);
 
