@@ -2,7 +2,7 @@ from app import app, db
 from flask import request, render_template, flash, redirect,url_for, send_from_directory
 from flask_login import current_user, login_user, logout_user,login_required
 from sqlalchemy import or_, and_, desc, func
-from models import User, Trip, Team, TeamUserAssociation, RequestsToJoinTeam
+from models import User, Trip, Team, TeamUserAssociation, RequestsToJoinTeam, PlacementsInTrip
 from forms import *
 from werkzeug.urls import url_parse
 import secrets
@@ -45,17 +45,31 @@ def new_trip(user_id):
         trip = Trip(tripname=form.tripname.data,speed=form.speed.data,
                     distance=form.distance.data,elevation=form.elevation.data, team_id=form.team.data,
                     prestige = int(form.prestige.data),description=form.description.data,user_id=user_id,n_of_partecipants=form.n_of_partecipants.data)
+        
+        placement_values=[]
+        for i in range(form.num_placements.data):
+            field_name = f"placement-{i}"
+            placement_value = request.form.get(field_name)
+            placement_values.append(int(placement_value))
+       
+
         t_r = TeamUserAssociation.query.filter(and_(TeamUserAssociation.user_id==user.id,TeamUserAssociation.team_id==form.team.data)).first().role
 
         if t_r == "team_leader" or user._is_admin: 
             trip.is_approved = True
-            trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,[])
+            trip.score = Trip.calculate_score(trip.speed,trip.distance,trip.elevation,trip.prestige,trip.n_of_partecipants,placement_values)
         else:
             trip.is_approved = False
 
         db.session.add(trip)
         db.session.commit()
         flash('New trip registered!')
+
+        for placement_value in placement_values:
+            placement = PlacementsInTrip(trip_id=trip.id, place=placement_value)
+            db.session.add(placement)
+        db.session.commit()
+        
         if user == current_user:
             return redirect(url_for('trips_overview',user_id=user.id))
         else:

@@ -76,11 +76,11 @@ class Trip(db.Model):
     description = Column(String(140))
     recorded_on = Column(DateTime, index=True, default=datetime.utcnow)
     n_of_partecipants = Column(Integer, nullable=False, default=1)
-    placement = Column(Integer)
     user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"))
     team_id = Column(Integer, ForeignKey('team.id', ondelete="CASCADE"))
     score = Column(Integer,default=0)
     is_approved = Column(Boolean,default=False)
+    placements = relationship("PlacementsInTrip", backref="trip", cascade="all, delete-orphan")
 
     def __repr__(self):
         return '<Trip {}>'.format(self.description)
@@ -103,7 +103,12 @@ class Trip(db.Model):
 
         p_f_o = punteggio_finale_o(v,dx,dz,pr)
         return punteggio_finale_f(p_f_o,np,piazzamenti)
-        
+
+class PlacementsInTrip(db.Model):
+    id = Column(Integer, primary_key=True)
+    trip_id = Column(Integer, ForeignKey('trip.id', ondelete="CASCADE"))
+    place = Column(Integer)
+
 class Team(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(140))
