@@ -94,9 +94,16 @@
                 input.type = "number";
                 input.name = "placement-" + i;
 
+                var deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.addEventListener("click", function () {
+                    this.parentNode.remove(); // Remove the parent div when delete button is clicked
+                });
+
                 var div = document.createElement("div");
                 div.appendChild(label);
                 div.appendChild(input);
+                div.appendChild(deleteButton);
 
                 placementEntriesContainer.appendChild(div);
             }
