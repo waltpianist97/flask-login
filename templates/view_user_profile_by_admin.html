@@ -12,6 +12,7 @@
                     <h1 style="color:red">Details dell'utente {{user.username}}</h1>
                 </caption>
 
+
                 <tbody>
 
                     <tr>
@@ -24,6 +25,7 @@
                     </tr>
                     <tr>
                         <td>Cognome</td>
+
                         <td>{{ user.surname}}</td>
                     </tr>
                     <tr>
@@ -36,6 +38,7 @@
                     </tr>
                     <tr>
                         <td>Numero di telefono</td>
+
                         <td>{{ user.phone_number }}</td>
                     </tr>
 
@@ -61,6 +64,7 @@
                         <th style="width:20%;">Nome</th>
                         <th style="width:20%;">Registrazione</th>
                         <th style="width:60%;">Ruolo</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -75,11 +79,13 @@
                             <a
                                 href="{{url_for('enroll_directly',team_id=team_role['team'].id,user_id=user.id)}}">Registra</a>
 
+
                         </td>
                         {% else %}
                         <td>
                             <a
                                 href="{{url_for('unenroll_from_team',team_id=team_role['team'].id,user_id=user.id)}}">Deregistra</a>
+
                         </td>
                         <td>
 
@@ -93,6 +99,7 @@
                                     <option value="team_leader">Team Leader</option>
                                     {% elif team_role["team_role"] == "team_leader" %}
                                     <option value="user">Membro</option>
+
                                     <option value="team_leader" selected>Team Leader</option>
                                     {% endif %}
                                 </select>

@@ -16,6 +16,7 @@
             <li><a href="{{url_for('member_view',user_id=user.id, team_id=team.id)}}">Home</a></li>
             <li><a href="{{url_for('member_profile',user_id=user.id,team_id=team.id)}}">Profilo<a></li>
 
+
         </ul>
     </div>
     <script>
@@ -39,6 +40,7 @@
             <table>
                 <caption>
                     <h1 style="color:red">Profilo utente</h1>
+
                 </caption>
                 <tr>
                     <td>Username</td>
@@ -50,6 +52,7 @@
                 </tr>
                 <tr>
                     <td>Cognome</td>
+
                     <td>{{user.surname}}</td>
                 </tr>
                 <tr>
@@ -62,11 +65,13 @@
                 </tr>
                 <tr>
                     <td>Numero di telefono</td>
+
                     <td>{{ user.phone_number }}</td>
                 </tr>
                 <tr>
                     <td>
                         Immagine di profilo
+
                     </td>
                     <td>{{ user.profile_picture }}</td>
                 </tr>

@@ -54,6 +54,7 @@ class NewTripForm(FlaskForm):
     submit_save = SubmitField('Salva')
 
 
+
 class NewTeamForm(FlaskForm):
     name = StringField('Nome della squadra',validators=[DataRequired()])
     description = TextAreaField('Descrizione')
