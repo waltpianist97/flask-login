@@ -31,25 +31,6 @@ def admin_home():
 
     return render_template('admin_home.html', users=users,trips=trips,teams=teams)
 
-@app.route('/new_user', methods=['GET', 'POST'])
-@login_required
-def new_user():
-
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user_check = User.query.filter(or_(User.email==form.email.data, User.username==form.username.data)).first()
-        if user_check:
-            flash('The user already exists, please register under different email and/or username!')
-            return redirect(url_for('new_user'))
-        
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('admin_home',username = user.username))
-
-    return render_template('new_user.html', title='Register new user', form=form)
 
 @app.route('/enroll_directly/<int:team_id>/<int:user_id>',methods=['GET', 'POST'])
 @login_required
@@ -71,13 +52,15 @@ def enroll_directly(team_id,user_id):
 
     db.session.commit()
 
-    
-    return redirect(url_for("admin_home",username=current_user.username))
+    if current_user._is_admin:
+        return redirect(url_for("view_user_profile_by_admin",user_id=user.id))
+    else:
+        return redirect(url_for("team_home",team_id=team.id))
 
 
-@app.route("/view_user_profile_by_TL/<int:user_id>")
+@app.route("/view_user_profile_by_admin/<int:user_id>")
 @login_required
-def view_user_profile_by_TL(user_id):
+def view_user_profile_by_admin(user_id):
     user = User.query.get(user_id)
     teams= Team.query.all()
     team_roles = []
@@ -87,7 +70,7 @@ def view_user_profile_by_TL(user_id):
         if t_r: 
             role=t_r.role
         team_roles.append({"team":team,"team_role":role})
-    return render_template("view_user_profile_by_TL.html",user=user,team_roles=team_roles)
+    return render_template("view_user_profile_by_admin.html",user=user,team_roles=team_roles)
  
 
 @app.route("/delete_team/<int:team_id>")
