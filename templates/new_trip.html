@@ -28,6 +28,10 @@
                         <td>{{ form.elevation() }}</td>
                     </tr>
                     <tr>
+                        <td>{{ form.team.label }}</td>
+                        <td>{{ form.team(class_="form-control") }}</td>
+                    </tr>
+                    <tr>
                         <td>{{ form.n_of_partecipants.label }}</td>
                         <td>{{ form.n_of_partecipants() }}</td>
                     </tr>
@@ -50,10 +54,11 @@
                     </tr>
                     <tr>
                         <td>{{ form.n_of_placements.label }}</td>
-                        <td>{{ form.n_of_placements() }}
+                        <td>
                             <div id="placement-entries">
 
                             </div>
+                            <button id="add-placement-button">Add Placement</button>
                         </td>
                     </tr>
                     <tr>
@@ -69,65 +74,46 @@
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        var numPlacementsField = document.getElementById("n_of_placements");
         var placementEntriesContainer = document.getElementById("placement-entries");
+        var placementCount = 0;
 
-        // Add event listener to numPlacementsField
-        numPlacementsField.addEventListener("input", function () {
-            var numPlacements = parseInt(numPlacementsField.value) || 0;
+        // Add event listener to "Add Placement" button
+        document.getElementById("add-placement-button").addEventListener("click", function (event) {
+            event.preventDefault(); // Prevent the button from triggering a form submission
+            placementCount++;
 
-            // Clear previous placement entries
-            placementEntriesContainer.innerHTML = "";
+            var label = document.createElement("label");
+            label.textContent = "Placement " + placementCount + ": ";
 
-            // Generate new placement entries
-            for (var i = 0; i < numPlacements; i++) {
-                var label = document.createElement("label");
-                label.textContent = "Placement " + (i + 1) + " ";
+            var select = document.createElement("select");
+            select.name = "placement[]";
 
-                var select = document.createElement("select");
-                select.name = "placement-" + i;
-
-                // Add options with values 1 to 10
-                for (var j = 1; j <= 10; j++) {
-                    var option = document.createElement("option");
-                    option.value = j;
-                    option.text = j + "\u00BA";
-                    select.appendChild(option);
-                }
-
-                var deleteButton = document.createElement("button");
-                deleteButton.textContent = "Elimina";
-                deleteButton.className = "delete-button";
-
-                deleteButton.addEventListener("click", function () {
-                    this.parentNode.remove(); // Remove the parent div when delete button is clicked
-                    updateNumPlacements(); // Update the n_of_placements field
-                });
-
-                var div = document.createElement("div");
-                div.appendChild(label);
-                div.appendChild(select);
-                div.appendChild(deleteButton);
-
-                placementEntriesContainer.appendChild(div);
+            // Add options with values 1 to 10
+            for (var j = 1; j <= 10; j++) {
+                var option = document.createElement("option");
+                option.value = j;
+                option.text = j + "\u00BA";
+                select.appendChild(option);
             }
-        });
 
-        // Update the n_of_placements field
-        function updateNumPlacements() {
-            var placementEntries = placementEntriesContainer.getElementsByTagName("div");
-            numPlacementsField.value = placementEntries.length;
-        }
+            var deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.className = "delete-button";
 
-        // Add event listener to delete buttons
-        placementEntriesContainer.addEventListener("click", function (event) {
-            if (event.target.classList.contains("delete-button")) {
-                event.target.parentNode.remove(); // Remove the parent div when delete button is clicked
-                updateNumPlacements(); // Update the n_of_placements field
-            }
+            deleteButton.addEventListener("click", function () {
+                this.parentNode.remove(); // Remove the parent div when delete button is clicked
+            });
+
+            var div = document.createElement("div");
+            div.appendChild(label);
+            div.appendChild(select);
+            div.appendChild(deleteButton);
+
+            placementEntriesContainer.appendChild(div);
         });
     });
 </script>
+
 
 
 {% endblock %}
