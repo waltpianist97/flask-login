@@ -8,7 +8,7 @@
             <div class="box">
                 <table>
                     <caption>
-                        <h1 style="color: red;">Aggiungi un nuovo giro</h1>
+                        <h1 style="color: red;">Aggiungi un giro</h1>
                     </caption>
 
                     <tr>
@@ -28,19 +28,15 @@
                         <td>{{ form.elevation() }}</td>
                     </tr>
                     <tr>
-                        <td>{{ form.team.label }}</td>
-                        <td>{{ form.team(class_="form-control") }}</td>
-                    </tr>
-                    <tr>
                         <td>{{ form.n_of_partecipants.label }}</td>
                         <td>{{ form.n_of_partecipants() }}</td>
                     </tr>
                     <tr>
                         <td>{{ form.prestige.label }}</td>
-                        <td style="word-wrap: break-word; word-break: break-all;">
+                        <td>
                             <div class="prestige-label-container">
                                 {% for subfield in form.prestige %}
-                                <label class="prestige-label" style="word-wrap: break-word; word-break: break-all;">
+                                <label class="prestige-label">
                                     {{ subfield }}
                                     <span>{{ subfield.label() }}</span>
                                 </label><br>
@@ -53,14 +49,13 @@
                         <td>{{ form.description(size=20, rows=5) }}</td>
                     </tr>
                     <tr>
-                        <td>{{form.n_of_placements.label}}</td>
-                        <td>{{form.n_of_placements()}}<br>
-                            <div id=" placement-entries">
-                            </div>
+                        <td>{{ form.n_of_placements.label }}</td>
+                        <td>{{ form.n_of_placements() }}
+                            <div id="placement-entries">
 
+                            </div>
                         </td>
                     </tr>
-
                     <tr>
                         <td colspan="2" style="text-align: center;">{{ form.submit_save }}</td>
                     </tr>
@@ -69,8 +64,9 @@
             </div>
         </form>
     </center>
+    <div class="left-sidebar"></div>
+    <div class="right-sidebar"></div>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var numPlacementsField = document.getElementById("n_of_placements");
@@ -85,37 +81,53 @@
 
             // Generate new placement entries
             for (var i = 0; i < numPlacements; i++) {
+                var label = document.createElement("label");
+                label.textContent = "Placement " + (i + 1) + " ";
 
-                var input = document.createElement("input");
-                input.type = "text";
-                input.name = "placement-" + i;
+                var select = document.createElement("select");
+                select.name = "placement-" + i;
+
+                // Add options with values 1 to 10
+                for (var j = 1; j <= 10; j++) {
+                    var option = document.createElement("option");
+                    option.value = j;
+                    option.text = j + "\u00BA";
+                    select.appendChild(option);
+                }
 
                 var deleteButton = document.createElement("button");
                 deleteButton.textContent = "Elimina";
-
                 deleteButton.className = "delete-button";
+
                 deleteButton.addEventListener("click", function () {
                     this.parentNode.remove(); // Remove the parent div when delete button is clicked
+                    updateNumPlacements(); // Update the n_of_placements field
                 });
 
                 var div = document.createElement("div");
-
-                div.appendChild(input);
+                div.appendChild(label);
+                div.appendChild(select);
                 div.appendChild(deleteButton);
 
                 placementEntriesContainer.appendChild(div);
             }
         });
 
+        // Update the n_of_placements field
+        function updateNumPlacements() {
+            var placementEntries = placementEntriesContainer.getElementsByTagName("div");
+            numPlacementsField.value = placementEntries.length;
+        }
+
         // Add event listener to delete buttons
         placementEntriesContainer.addEventListener("click", function (event) {
             if (event.target.classList.contains("delete-button")) {
                 event.target.parentNode.remove(); // Remove the parent div when delete button is clicked
+                updateNumPlacements(); // Update the n_of_placements field
             }
         });
     });
 </script>
 
-<div class="left-sidebar"></div>
-<div class="right-sidebar"></div>
+
 {% endblock %}

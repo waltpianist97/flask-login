@@ -95,32 +95,49 @@
 
             // Generate new placement entries
             for (var i = 0; i < numPlacements; i++) {
+                var label = document.createElement("label");
+                label.textContent = "Placement " + (i + 1) + " ";
 
-                var input = document.createElement("input");
-                input.type = "text";
-                input.name = "placement-" + i;
+                var select = document.createElement("select");
+                select.name = "placement-" + i;
+
+                // Add options with values 1 to 10
+                for (var j = 1; j <= 10; j++) {
+                    var option = document.createElement("option");
+                    option.value = j;
+                    option.text = j;
+                    select.appendChild(option);
+                }
 
                 var deleteButton = document.createElement("button");
                 deleteButton.textContent = "Elimina";
-
                 deleteButton.className = "delete-button";
+
                 deleteButton.addEventListener("click", function () {
                     this.parentNode.remove(); // Remove the parent div when delete button is clicked
+                    updateNumPlacements(); // Update the n_of_placements field
                 });
 
                 var div = document.createElement("div");
-
-                div.appendChild(input);
+                div.appendChild(label);
+                div.appendChild(select);
                 div.appendChild(deleteButton);
 
                 placementEntriesContainer.appendChild(div);
             }
         });
 
+        // Update the n_of_placements field
+        function updateNumPlacements() {
+            var placementEntries = placementEntriesContainer.getElementsByTagName("div");
+            numPlacementsField.value = placementEntries.length;
+        }
+
         // Add event listener to delete buttons
         placementEntriesContainer.addEventListener("click", function (event) {
             if (event.target.classList.contains("delete-button")) {
                 event.target.parentNode.remove(); // Remove the parent div when delete button is clicked
+                updateNumPlacements(); // Update the n_of_placements field
             }
         });
     });
