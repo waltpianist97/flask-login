@@ -25,14 +25,13 @@
                 <th><strong>Data</strong></th>
                 <th><strong>Prestigio</strong></th>
                 <th><strong>Punteggio</strong></th>
+                <th><strong>Azioni</strong></th>
             </thead>
 
             <tbody>
                 {%for trip in trips_group['trips_by_team']%}
                 <tr>
-                    <td><a href="{{url_for('edit_trip',trip_id=trip.id,user_id=current_user.id)}}">{{ trip.tripname
-                            }}</a>
-                    </td>
+                    <td>{{ trip.tripname}}</td>
                     <td>{{ trip.speed }}</td>
                     <td>{{ trip.distance }}</td>
                     <td>{{ trip.elevation }}</td>
@@ -40,14 +39,18 @@
                     <td>{{ trip.recorded_on.strftime("%d/%m/%Y") }}</td>
                     <td>{{ trip.prestige }}</td>
                     <td>{{ trip.score }}</td>
-
+                    <td><a href="{{url_for('edit_trip',trip_id=trip.id,user_id=current_user.id)}}"><i
+                                class="fas fa-edit"></i></a>
+                        <a href="{{ url_for('delete_trip', trip_id=trip.id, user_id=current_user.id) }}"><i
+                                class="fas fa-times"></i></a>
+                    </td>
 
                 </tr>
                 {%endfor%}
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="8" style="text-align: center;">
+                    <td colspan="9" style="text-align: center;">
                         <button>
                             <a href="{{url_for('new_trip',user_id=current_user.id,team_id=trips_group['team_id'])}}"
                                 style="align-items:center; color:black;">Aggiungi un nuovo giro

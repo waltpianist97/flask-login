@@ -47,6 +47,8 @@
                     <th><strong>Data</strong></th>
                     <th><strong>Prestigio</strong></th>
                     <th><strong>Punteggio</strong></th>
+                    <th><strong>Azioni</strong></th>
+
                 </thead>
 
                 <tbody>
@@ -70,6 +72,12 @@
                             <td>{{ trip["trip"].recorded_on.strftime("%d/%m/%Y") }}</td>
                             <td>{{ trip["trip"].prestige }}</td>
                             <td>{{ trip["trip"].score }}</td>
+                            <td><a href="{{url_for('edit_trip',trip_id=trip['trip'].id,user_id=trip['user'].id)}}"><i
+                                        class="fas fa-edit"></i></a>
+                                <a
+                                    href="{{ url_for('delete_trip', trip_id=trip['trip'].id, user_id=trip['user'].id) }}"><i
+                                        class="fas fa-times"></i></a>
+                            </td>
                         </tr>
                     </form>
                     {%endfor%}
