@@ -38,9 +38,15 @@
                     <h1 style="color:red">Giri registrati per {{team.name}} </h1>
                 </caption>
                 <thead>
-                    <th><strong>Nome del giro</strong></th>
                     <th><strong>Membro</strong></th>
+                    <th><strong>Nome del giro</strong></th>
+                    <th><strong>Velocità (km/h)</strong></th>
+                    <th><strong>Distanza (km)</strong></th>
+                    <th><strong>Dislivello (m)</strong></th>
+                    <th><strong>Numero di partecipanti</strong></th>
                     <th><strong>Data</strong></th>
+                    <th><strong>Prestigio</strong></th>
+                    <th><strong>Punteggio</strong></th>
                 </thead>
 
                 <tbody>
@@ -48,6 +54,8 @@
                     <form method="POST" action="{{url_for('approve_trip',trip_id=trip['trip'].id)}}">
 
                         <tr>
+                            <td>{{ trip["user"].username }}</td>
+
                             <input type="hidden" name="trip_id" value="{{trip['trip'].id }}">
                             <td>
                                 <a
@@ -55,8 +63,13 @@
                                     trip["trip"].tripname }}
                                 </a>
                             </td>
-                            <td>{{ trip["user"].username }}</td>
+                            <td>{{ trip["trip"].speed }}</td>
+                            <td>{{ trip["trip"].distance }}</td>
+                            <td>{{ trip["trip"].elevation }}</td>
+                            <td>{{ trip["trip"].n_of_partecipants }}</td>
                             <td>{{ trip["trip"].recorded_on.strftime("%d/%m/%Y") }}</td>
+                            <td>{{ trip["trip"].prestige }}</td>
+                            <td>{{ trip["trip"].score }}</td>
                         </tr>
                     </form>
                     {%endfor%}
