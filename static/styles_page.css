@@ -180,6 +180,14 @@
     /* Added table-layout property */
 }
 
+.green-bg {
+    background-color: green;
+}
+
+.red-bg {
+    background-color: yellow;
+}
+
 .box td,
 .box th {
     padding: 5px;
