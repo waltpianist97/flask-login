@@ -60,13 +60,14 @@ def new_trip(user_id,team_id=None):
         trip = Trip(tripname=form.tripname.data,speed=form.speed.data, n_of_placements=form.n_of_placements.data,
                     distance=form.distance.data,elevation=form.elevation.data, team_id=form.team.data, recorded_on=recorded_on,
                     prestige = int(form.prestige.data),description=form.description.data,user_id=user_id,n_of_partecipants=form.n_of_partecipants.data)
+    
+        db.session.add(trip)
+        db.session.flush()  # Flush changes to assign an ID to the trip object
+        
+        placement_values= [int(pl) for pl in request.form.getlist('placement[]')]
 
-        placement_values=[]
-        for i in range(form.n_of_placements.data):
-            field_name = f"placement-{i}"
-            placement_value = request.form.get(field_name)
-            placement_values.append(int(placement_value))
-            
+        for placement_value in placement_values:
+              
             placement = PlacementsInTrip(trip_id=trip.id, place=placement_value)
             db.session.add(placement)
 
@@ -80,7 +81,6 @@ def new_trip(user_id,team_id=None):
         else:
             trip.is_approved = False
 
-        db.session.add(trip)
         db.session.commit()
         flash('New trip registered!')
 
@@ -179,7 +179,7 @@ def delete_trip(trip_id,user_id):
     if user_id == current_user.id:
         return redirect(url_for('trips_overview',user_id=current_user.id))
     else:
-        return redirect(url_for('member_view', user_id=user_id,team_id=trip.team_id))
+        return redirect(url_for('manage_trips', team_id=trip.team_id))
   
 
 
