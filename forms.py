@@ -69,6 +69,7 @@ class TeamProfileForm(FlaskForm):
     name = StringField('Nome della squadra',validators=[DataRequired()])
     description = TextAreaField('Descrizione')
     team_picture = FileField('')
+    team_background = FileField('')
     submit = SubmitField('Salva')
 
 
