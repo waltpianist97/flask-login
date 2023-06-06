@@ -9,6 +9,8 @@ import secrets
 from datetime import datetime, timedelta
 import smtplib
 from tools import AUTO_MAIL, send_email_utility
+import os 
+
 DATE_FORMAT = "%d/%m/%Y"
 
 #%% GENERAL   
@@ -104,9 +106,11 @@ def new_trip(user_id,team_id=None):
         
     return render_template('new_trip.html',title="Add new trip", form = form, teams= teams)
 
-@app.route('/images/<filename>')
-def serve_image(filename):
-    return send_from_directory('images', filename)
+@app.route('/images/<path:filepath>')
+def serve_image(filepath):
+    directory = 'images'
+    full_path = os.path.join(directory, filepath)
+    return send_from_directory(directory, os.path.basename(full_path))
 
 @app.route("/edit_trip/<int:trip_id>/<int:user_id>", methods=['GET', 'POST'])
 @login_required
@@ -293,8 +297,12 @@ def register():
 
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
+        user.create_pictures_folder()
+
         db.session.add(user)
         db.session.commit()
+        
+
         flash('Congratulazioni, ti sei registrato sulla piattaforma!')
         return redirect(url_for('login'))
    

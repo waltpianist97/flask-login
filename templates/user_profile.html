@@ -6,14 +6,15 @@
 <div class="left-sidebar" style="background-image: url('../images/default_vertical_banner.png');">
     {%else%}
     <div class="left-sidebar"
-        style="background-image: url('data:image/png;base64,{{ current_user.profile_banner|b64encode }}');">
+        style="background-image: url('{{ url_for('serve_image', filepath=current_user.profile_banner) }}');">
+
         {%endif%}
 
         <div class="popup-btn-container">
             {%if not current_user.profile_picture%}
-            <img src="{{ url_for('serve_image', filename='app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
+            <img src="{{ url_for('serve_image', filepath='app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
             {%else%}
-            <img src="data:image/png;base64,{{ current_user.profile_picture|b64encode }}" class="popup-btn"
+            <img src="{{ url_for('serve_image', filepath=current_user.profile_picture) }}" class="popup-btn"
                 alt="Popup Image">
             {%endif%}
             <i class="fas fa-bars menu-symbol"></i><span class="menu-text">Menu</span>
@@ -53,8 +54,10 @@
     {%if not current_user.profile_background%}
     <div class="main" style="background-image: url('../images/wallpaper_user_home.jpg');">
         {%else%}
+
         <div class="main"
-            style="background-image: url('data:image/png;base64,{{ current_user.profile_background|b64encode }}');">
+            style="background-image: url('{{ url_for('serve_image', filepath=current_user.profile_background) }}');">
+
             {%endif%}
             <center>
                 <div class="box">
@@ -64,6 +67,7 @@
                             <caption>
                                 <h1 style="color:red">Le tue impostazioni di profilo</h1>
                             </caption>
+
                             <tr>
                                 <td>{{ form.username.label }}</td>
                                 <td>{{ form.username() }}</td>
@@ -71,34 +75,66 @@
                             <tr>
                                 <td>{{ form.name.label }}</td>
                                 <td>{{ form.name() }}</td>
+
                             </tr>
                             <tr>
                                 <td>{{ form.surname.label }}</td>
                                 <td>{{ form.surname() }}</td>
+
                             </tr>
                             <tr>
                                 <td>{{ form.email.label }}</td>
                                 <td>{{ form.email() }}</td>
+
                             </tr>
                             <tr>
                                 <td>{{ form.strava_account.label }}</td>
                                 <td>{{ form.strava_account() }}</td>
+
                             </tr>
                             <tr>
                                 <td>{{ form.phone_number.label }}</td>
                                 <td>{{ form.phone_number() }}</td>
+
                             </tr>
                             <tr>
                                 <td>{{form.profile_picture.label}}</td>
-                                <td>{{ form.profile_picture() }}</td>
+                                <td>{{ form.profile_picture() }}
+
+                                    {% if form.profile_picture.data %}
+                                    <button>
+                                        <a style="color:black"
+                                            href="{{url_for('delete_file',target='users',file_db_column='profile_picture',filepath=form.profile_picture.data)}}">Elimina</a>
+
+                                    </button>
+                                    {% endif %}
+                                </td>
+
                             </tr>
                             <tr>
                                 <td>{{form.profile_background.label}}</td>
-                                <td>{{ form.profile_background() }}</td>
+                                <td>{{ form.profile_background() }}
+                                    {% if form.profile_background.data %}
+                                    <button>
+                                        <a style="color:black"
+                                            href="{{url_for('delete_file',target='users',file_db_column='profile_background',filepath=form.profile_background.data)}}">Elimina</a>
+                                    </button>
+
+                                    {% endif %}
+                                </td>
                             </tr>
                             <tr>
                                 <td>{{ form.profile_banner.label }}</td>
-                                <td>{{ form.profile_banner() }}</td>
+                                <td>{{ form.profile_banner() }}
+                                    {% if form.profile_banner.data %}
+
+                                    <button>
+                                        <a style="color:black"
+                                            href="{{url_for('delete_file',target='users',file_db_column='profile_banner',filepath=form.profile_banner.data)}}">Elimina</a>
+                                    </button>
+                                    {% endif %}
+                                </td>
+
                             </tr>
                             <tr>
 
@@ -142,11 +178,13 @@
                 {% endwith %}
             </center>
         </div>
+
         {%if not current_user.profile_banner%}
         <div class="right-sidebar" style="background-image: url('../images/default_vertical_banner.png');">
             {%else%}
             <div class="right-sidebar"
-                style="background-image: url('data:image/png;base64,{{ current_user.profile_banner|b64encode }}');">
+                style="background-image: url('{{ url_for('serve_image', filepath=current_user.profile_banner) }}');">
+
                 {%endif%}
 
             </div>

@@ -8,8 +8,9 @@
 <div class="main" style="background-image: url('../images/wallpaper_user_home.jpg');">
     {%else%}
     <div class="main"
-        style="background-image: url('data:image/png;base64,{{ current_user.profile_background|b64encode }}');">
+        style="background-image: url('{{ url_for('serve_image', filepath=current_user.profile_background) }}');">
         {%endif%}
+
         <div class="box">
             <h1 style="color:red; text-align: center;">Panoramica giri per {{current_user.username}}!</h1>
 
@@ -81,20 +82,20 @@
         {% endwith %}
     </div>
 
-
     {%if not current_user.profile_banner%}
     <div class="left-sidebar" style="background-image: url('../images/default_vertical_banner.png');">
         {%else%}
         <div class="left-sidebar"
-            style="background-image: url('data:image/png;base64,{{ current_user.profile_banner|b64encode }}');">
+            style="background-image: url('{{ url_for('serve_image', filepath=current_user.profile_banner) }}');">
+
             {%endif%}
 
 
             <div class="popup-btn-container">
                 {%if not current_user.profile_picture%}
-                <img src="{{ url_for('serve_image', filename='app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
+                <img src="{{ url_for('serve_image', filepath='app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
                 {%else%}
-                <img src="data:image/png;base64,{{ user.profile_picture|b64encode }}" class="popup-btn"
+                <img src="{{ url_for('serve_image', filepath=current_user.profile_picture) }}" class="popup-btn"
                     alt="Popup Image">
                 {%endif%}
                 <i class="fas fa-bars menu-symbol"></i><span class="menu-text">Menu</span>
@@ -133,11 +134,13 @@
         </div>
 
 
+
         {%if not current_user.profile_banner%}
         <div class="right-sidebar" style="background-image: url('../images/default_vertical_banner.png');">
             {%else%}
             <div class="right-sidebar"
-                style="background-image: url('data:image/png;base64,{{ current_user.profile_banner|b64encode }}');">
+                style="background-image: url('{{ url_for('serve_image', filepath=current_user.profile_banner) }}');">
+
                 {%endif%}
             </div>
 
