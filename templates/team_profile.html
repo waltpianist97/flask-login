@@ -3,15 +3,17 @@
 {% block content %}
 
 {%if not team.team_banner%}
-<div class="left-sidebar" style="background-image: url('../images/default_vertical_banner.png');">
+<div class="left-sidebar" style="background-image: url('../images/defaults/default_vertical_banner.png');">
     {%else%}
-    <div class="left-sidebar" style="background-image: url('data:image/png;base64,{{ team.team_banner|b64encode }}');">
+    <div class="left-sidebar" style="background-image: url('{{ url_for('serve_image', filepath=team.team_banner) }}');">
         {%endif%}
+
         <div class="popup-btn-container">
             {%if not team.team_picture%}
-            <img src="{{ url_for('serve_image', filename='app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
+            <img src="{{ url_for('serve_image', filepath='defaults/app_icon.jpg') }}" class="popup-btn"
+                alt="Popup Image">
             {%else%}
-            <img src="data:image/png;base64,{{ team.team_picture|b64encode }}" class="popup-btn" alt="Popup Image">
+            <img src="{{ url_for('serve_image', filepath=team.team_picture) }}" class="popup-btn" alt="Popup Image">
             {%endif%}
             <i class="fas fa-bars menu-symbol"></i><span class="menu-text">Menu</span>
         </div>
@@ -39,9 +41,9 @@
 
     </div>
     {%if not team.team_background%}
-    <div class="main" style="background-image: url('../images/wallpaper_team_home.jpg');">
+    <div class="main" style="background-image: url('../images/defaults/wallpaper_team_home.jpg');">
         {%else%}
-        <div class="main" style="background-image: url('data:image/png;base64,{{ team.team_background|b64encode }}');">
+        <div class="main" style="background-image: url('{{ url_for('serve_image', filepath=team.team_background) }}');">
             {%endif%}
             <center>
 
@@ -63,19 +65,57 @@
                             </tr>
                             <tr>
                                 <td>{{ form.team_picture.label }}</td>
-                                <td>{{ form.team_picture() }}</td>
+                                <td>{{ form.team_picture() }}
+
+
+                                    {% if form.team_picture.data %}
+                                    <button>
+                                        <a style="color:black"
+                                            href="{{url_for('delete_file',target='teams',file_db_column='team_picture',filepath=form.team_picture.data,team_id=team.id)}}">Elimina</a>
+
+                                    </button>
+                                    {% endif %}
+
+                                </td>
                             </tr>
                             <tr>
                                 <td>{{ form.team_background.label }}</td>
-                                <td>{{ form.team_background() }}</td>
+                                <td>{{ form.team_background() }}
+
+                                    {% if form.team_background.data %}
+                                    <button>
+                                        <a style="color:black"
+                                            href="{{url_for('delete_file',target='teams',file_db_column='team_background',filepath=form.team_background.data,team_id=team.id)}}">Elimina</a>
+
+                                    </button>
+                                    {% endif %}
+                                </td>
                             </tr>
                             <tr>
                                 <td>{{ form.team_banner.label }}</td>
-                                <td>{{ form.team_banner() }}</td>
+                                <td>{{ form.team_banner() }}
+                                    {% if form.team_banner.data %}
+                                    <button>
+                                        <a style="color:black"
+                                            href="{{url_for('delete_file',target='teams',file_db_column='team_banner',filepath=form.team_banner.data,team_id=team.id)}}">Elimina</a>
+
+                                    </button>
+                                    {% endif %}
+
+                                </td>
                             </tr>
                             <tr>
                                 <td>{{ form.team_motto.label }}</td>
-                                <td>{{ form.team_motto() }}</td>
+                                <td>{{ form.team_motto() }}
+
+                                    {% if form.team_motto.data %}
+                                    <button>
+                                        <a style="color:black"
+                                            href="{{url_for('delete_file',target='teams',file_db_column='team_motto',filepath=form.team_motto.data,team_id=team.id)}}">Elimina</a>
+
+                                    </button>
+                                    {% endif %}
+                                </td>
                             </tr>
                             <tr>
 
@@ -103,14 +143,14 @@
 
 
         {%if not team.team_banner%}
-        <div class="right-sidebar" style="background-image: url('../images/default_vertical_banner.png');">
+        <div class="right-sidebar" style="background-image: url('../images/defaults/default_vertical_banner.png');">
             {%else%}
             <div class="right-sidebar"
-                style="background-image: url('data:image/png;base64,{{ team.team_banner|b64encode }}');">
+                style="background-image: url('{{ url_for('serve_image', filepath=team.team_banner) }}');">
                 {%endif%}
 
                 {%if team.team_motto%}
-                <img src="data:image/png;base64,{{ team.team_motto|b64encode }}" alt="motto" class="centered-image">
+                <img src="{{ url_for('serve_image', filepath=team.team_motto) }}" alt="motto" class="centered-image">
 
                 <style>
                     .right-sidebar {

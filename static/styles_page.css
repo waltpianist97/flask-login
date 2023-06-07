@@ -111,7 +111,7 @@
 /* Set up the right sidebar */
 .right-sidebar {
     width: 20%;
-    height: calc(100% - 100px);
+    height: calc(100% - 99px);
     top: 50px;
     bottom: 0px;
     right: 0px;
@@ -142,7 +142,7 @@
 /* Set up the main content area */
 .main {
     width: 60%;
-    height: calc(100% - 100px);
+    height: calc(100% - 99px);
     background-size: 100% 100%;
     background-position: center;
     left: 20%;
@@ -245,7 +245,7 @@
 /* Set up the left sidebar */
 .left-sidebar {
     width: 20%;
-    height: calc(100% - 100px);
+    height: calc(100% - 99px);
     top: 50px;
     bottom: 0px;
     left: 0px;
@@ -345,7 +345,6 @@ body {
 .content-container {
     height: calc(100% - 100px);
     padding-top: 50px;
-    background-image: url("../images/wallpaper_landing_page.jpg");
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;

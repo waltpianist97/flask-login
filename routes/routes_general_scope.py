@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 import smtplib
 from tools import AUTO_MAIL, send_email_utility
 import os 
+from urllib.parse import unquote
 
 DATE_FORMAT = "%d/%m/%Y"
 
@@ -106,11 +107,12 @@ def new_trip(user_id,team_id=None):
         
     return render_template('new_trip.html',title="Add new trip", form = form, teams= teams)
 
-@app.route('/images/<path:filepath>')
+@app.route('/images/<path:filepath>',methods=['GET', 'POST'])
 def serve_image(filepath):
     directory = 'images'
     full_path = os.path.join(directory, filepath)
-    return send_from_directory(directory, os.path.basename(full_path))
+
+    return send_from_directory(os.path.dirname(full_path), os.path.basename(full_path))
 
 @app.route("/edit_trip/<int:trip_id>/<int:user_id>", methods=['GET', 'POST'])
 @login_required

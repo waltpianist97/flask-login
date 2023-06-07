@@ -131,10 +131,10 @@ class Team(db.Model):
     users = relationship('User', secondary="team_user_association", back_populates='teams')
     join_requests = relationship("RequestsToJoinTeam", back_populates="team", cascade="all, delete-orphan")
     description = Column(String(140))
-    team_picture = Column(BLOB)
-    team_background = Column(BLOB)
-    team_banner = Column(BLOB)
-    team_motto = Column(BLOB)
+    team_picture = Column(String(140))
+    team_background = Column(String(140))
+    team_banner = Column(String(140))
+    team_motto = Column(String(140))
 
     def __repr__(self):
         return '<Team {}>'.format(self.description)
@@ -147,6 +147,10 @@ class Team(db.Model):
     def get_leaders(self):
         leaders = User.query.join(TeamUserAssociation).filter(TeamUserAssociation.team_id == self.id, TeamUserAssociation.role == "team_leader").all()
         return leaders
+    
+    def create_pictures_folder(self):
+        pics_folder_path = f"images/teams/{self.name}"
+        os.mkdir(pics_folder_path)
     
 class RequestsToJoinTeam(db.Model):
     __tablename__ = 'requests_to_join_team'

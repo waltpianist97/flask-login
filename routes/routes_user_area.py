@@ -43,15 +43,29 @@ def user_home(username):
     return render_template('user_home.html', user=user,teams=teams,new_enrollments=message, last_trips=last_trips,stat=stat)
 
 @app.route('/delete_file/<target>/<file_db_column>/<path:filepath>', methods=['GET', 'POST'])
+@app.route('/delete_file/<target>/<file_db_column>/<path:filepath>/<int:team_id>', methods=['GET', 'POST'])
 @login_required
-def delete_file(target,file_db_column,filepath):
-    picture_uploader = PictureUploader(target,current_user.username)
-    picture_uploader.delete_file(filepath)
-    if hasattr(current_user, file_db_column):
-        setattr(current_user, file_db_column, None)
-        db.session.commit()   
-    
-    return redirect(url_for('user_profile'))
+def delete_file(target,file_db_column,filepath,team_id=None):
+
+    picture_uploader = None
+
+    if not team_id:
+        picture_uploader = PictureUploader(target,current_user.username)
+        picture_uploader.delete_file(filepath)
+        if hasattr(current_user, file_db_column):
+            setattr(current_user, file_db_column, None)
+            db.session.commit() 
+        return redirect(url_for('user_profile'))
+
+    else:
+        team = Team.query.get(team_id)
+        picture_uploader = PictureUploader(target,team.name)
+        picture_uploader.delete_file(filepath)
+        if hasattr(team, file_db_column):
+            setattr(team, file_db_column, None)
+            db.session.commit() 
+        return redirect(url_for('team_profile',team_id=team_id))
+
 
 
 

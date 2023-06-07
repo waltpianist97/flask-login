@@ -7,7 +7,7 @@
 
 
 {%if not current_user.profile_background%}
-<div class="main" style="background-image: url('../images/wallpaper_user_home.jpg');">
+<div class="main" style="background-image: url('../images/defaults/wallpaper_user_home.jpg');">
     {%else%}
     <div class="main"
         style="background-image: url('{{ url_for('serve_image', filepath=current_user.profile_background) }}');">
@@ -62,7 +62,7 @@
     </div>
 
     {%if not current_user.profile_banner%}
-    <div class="left-sidebar" style="background-image: url('../images/default_vertical_banner.png');">
+    <div class="left-sidebar" style="background-image: url('../images/defaults/default_vertical_banner.png');">
         {%else%}
         <div class="left-sidebar"
             style="background-image: url('{{ url_for('serve_image', filepath=current_user.profile_banner) }}');">
@@ -112,7 +112,7 @@
         </div>
 
         {%if not current_user.profile_banner%}
-        <div class="right-sidebar" style="background-image: url('../images/default_vertical_banner.png');">
+        <div class="right-sidebar" style="background-image: url('../images/defaults/default_vertical_banner.png');">
             {%else%}
             <div class="right-sidebar"
                 style="background-image: url('{{ url_for('serve_image', filepath=current_user.profile_banner) }}');">

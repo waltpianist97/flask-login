@@ -7,7 +7,7 @@ from forms import *
 from werkzeug.urls import url_parse
 import secrets
 from datetime import datetime, timedelta
-from tools import send_email_utility, AUTO_MAIL
+from tools import send_email_utility, AUTO_MAIL, PictureUploader
 
 
 @app.route("/team_profile/<int:team_id>", methods=['GET', 'POST'])
@@ -17,22 +17,36 @@ def team_profile(team_id):
     team = Team.query.get(team_id)
     my_role_in_team = current_user.get_role_in_team(team_id=team_id)
     form = TeamProfileForm(obj=team)
+    picture_uploader = PictureUploader("teams",team.name)
+
     if form.validate_on_submit():
         # Handle profile picture upload
         team.name = form.name.data
         team.description = form.description.data
 
         if form.team_picture.data:
-            team.team_picture = form.team_picture.data.read()
+            file = form.team_picture.data
+            picture_uploader.delete_file(team.team_picture)
+            filename = picture_uploader.load_file(file)
+            team.team_picture = f'teams/{team.name}/{filename}'
 
         if form.team_background.data:
-            team.team_background = form.team_background.data.read()
-        
-        if form.team_banner.data:
-            team.team_banner = form.team_banner.data.read()
+            file = form.team_background.data
+            picture_uploader.delete_file(team.team_background)
+            filename = picture_uploader.load_file(file)
+            team.team_background = f'teams/{team.name}/{filename}'        
 
+        if form.team_banner.data:
+            file = form.team_banner.data
+            picture_uploader.delete_file(team.team_banner)
+            filename = picture_uploader.load_file(file)
+            team.team_banner = f'teams/{team.name}/{filename}'  
+            
         if form.team_motto.data:
-            team.team_motto = form.team_motto.data.read()
+            file = form.team_motto.data
+            picture_uploader.delete_file(team.team_motto)
+            filename = picture_uploader.load_file(file)
+            team.team_motto = f'teams/{team.name}/{filename}'  
 
         db.session.commit()
         flash('Le impostazioni del team sono state aggiornate!', 'success')

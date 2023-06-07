@@ -1,16 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 {%if not team.team_banner%}
-<div class="left-sidebar" style="background-image: url('../images/default_vertical_banner.png');">
+<div class="left-sidebar" style="background-image: url('../images/defaults/default_vertical_banner.png');">
     {%else%}
-    <div class="left-sidebar" style="background-image: url('data:image/png;base64,{{ team.team_banner|b64encode }}');">
+    <div class="left-sidebar" style="background-image: url('{{ url_for('serve_image', filepath=team.team_banner) }}');">
         {%endif%}
+
         <div class="popup-btn-container">
             {%if not team.team_picture%}
-            <img src="{{ url_for('serve_image', filename='app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
+            <img src="{{ url_for('serve_image', filepath='defaults/app_icon.jpg') }}" class="popup-btn"
+                alt="Popup Image">
             {%else%}
-            <img src="data:image/png;base64,{{ team.team_picture|b64encode }}" class="popup-btn" alt="Popup Image">
+            <img src="{{ url_for('serve_image', filepath=team.team_picture) }}" class="popup-btn" alt="Popup Image">
             {%endif%}
             <i class="fas fa-bars menu-symbol"></i><span class="menu-text">Menu</span>
         </div>
@@ -35,9 +38,9 @@
         </script>
     </div>
     {%if not team.team_background%}
-    <div class="main" style="background-image: url('../images/wallpaper_team_home.jpg');">
+    <div class="main" style="background-image: url('../images/defaults/wallpaper_team_home.jpg');">
         {%else%}
-        <div class="main" style="background-image: url('data:image/png;base64,{{ team.team_background|b64encode }}');">
+        <div class="main" style="background-image: url('{{ url_for('serve_image', filepath=team.team_background) }}');">
             {%endif%}
 
             <center>
@@ -164,14 +167,15 @@
         </div>
 
         {%if not team.team_banner%}
-        <div class="right-sidebar" style="background-image: url('../images/default_vertical_banner.png');">
+        <div class="right-sidebar" style="background-image: url('../images/defaults/default_vertical_banner.png');">
             {%else%}
             <div class="right-sidebar"
-                style="background-image: url('data:image/png;base64,{{ team.team_banner|b64encode }}');">
+                style="background-image: url('{{ url_for('serve_image', filepath=team.team_banner) }}');">
                 {%endif%}
 
+
                 {%if team.team_motto%}
-                <img src="data:image/png;base64,{{ team.team_motto|b64encode }}" alt="motto" class="centered-image">
+                <img src="{{ url_for('serve_image', filepath=team.team_motto) }}" alt="motto" class="centered-image">
 
                 <style>
                     .right-sidebar {
