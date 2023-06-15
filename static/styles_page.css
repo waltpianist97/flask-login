@@ -257,20 +257,25 @@
 
 }
 
+
 .logout-button {
-    position: absolute;
-    right: 20px;
     background-color: grey;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin-right: 10px;
+    margin-left: 10px;
     height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 3px;
+    width: fit-content;
+
 }
+
+
 
 .home-button {
     background-color: grey;
