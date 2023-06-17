@@ -1,25 +1,26 @@
 .menu-symbol {
-    position: absolute;
+    position: relative;
     color: rgb(15, 15, 15);
     font-size: 20px;
-    left: -50px;
-    bottom: -140px;
+    left: 5%;
+    bottom: 0%;
     cursor: pointer;
 }
 
 
 .menu-text {
-    position: absolute;
+    position: relative;
+    margin-bottom: 10px;
     color: rgb(15, 15, 15);
     font-size: 20px;
-    left: -20px;
-    bottom: -140px;
+    left: 20%;
+    bottom: 0%;
 }
 
 .popup-btn-container {
     position: absolute;
-    top: calc(50% + 10px);
-    left: 40%;
+    top: 0;
+    left: 0;
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
@@ -28,11 +29,20 @@
 .popup {
     position: absolute;
     display: none;
-    top: calc(70% + 80px);
-    left: 40%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-    border: 1px solid #ccc;
+    top: calc(100% + 10px);
+    /* Position the popup below the menu container by default */
+    left: -5%;
+    padding: 10px;
+    /* Add padding for content */
+}
+
+@media (max-width: 1000px) {
+    .popup {
+        top: 50%;
+        left: 50%;
+        transform: translateY(-50%);
+
+    }
 }
 
 .popup-btn {
@@ -87,6 +97,7 @@
 .popup li.subitem {
     padding: 5px 10px;
     cursor: pointer;
+    color: white;
 }
 
 .popup li.subitem:hover {
@@ -138,6 +149,7 @@
     height: 400px;
     /* desired height */
 }
+
 
 /* Set up the main content area */
 .main {
@@ -290,9 +302,27 @@
     align-items: center;
     justify-content: center;
     padding: 3px;
-
 }
 
+.logout-button {
+    float: right;
+}
+
+.round-container {
+    display: inline-block;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.menu-container {
+    display: flex;
+    align-items: center;
+}
+
+.menu-container i,
+.menu-container span {
+    margin-right: 10px;
+}
 
 /* Set up the header */
 .header {

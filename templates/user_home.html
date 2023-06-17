@@ -7,17 +7,9 @@
 
 {%block columnCenter%}
 
-{%if not current_user.profile_background%}
+{%if current_user.profile_background%}
 <style>
-    .col-md-6.column1 {
-        background-image: url('../images/defaults/wallpaper_user_home.jpg');
-        /* Additional background styles if needed */
-    }
-</style>
-
-{%else%}
-<style>
-    .col-md-6.column1 {
+    .center-column-box {
         background-image: url("{{ url_for('serve_image', filepath=current_user.profile_background) }}");
 
     }
@@ -82,50 +74,53 @@
 {%block columnLeft%}
 
 
-{%if not current_user.profile_banner%}
+{%if current_user.profile_banner%}
 <style>
-    .col-md-3.column1 {
-        background-image: url('../images/defaults/default_vertical_banner.png');
-        /* Additional background styles if needed */
-    }
-</style>
-
-{%else%}
-<style>
-    .col-md-3.column1 {
+    .left-column {
         background-image: url("{{ url_for('serve_image', filepath=current_user.profile_banner) }}");
 
     }
 </style>
 {%endif%}
 
-<div class="popup-btn-container">
-    {%if not current_user.profile_picture%}
-    <img src="{{ url_for('serve_image', filepath='app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
-    {%else%}
-    <img src="{{ url_for('serve_image', filepath=current_user.profile_picture) }}" class="popup-btn" alt="Popup Image">
-    {%endif%}
+<div class="transparent-box" style="display: inline-block;">
 
-    <i class="fas fa-bars menu-symbol"></i><span class="menu-text">Menu</span>
-</div>
-<div class="popup" id="popup">
-    <ul>
-        <li><a href="{{url_for('user_home',username=current_user.username)}}">Home</a></li>
-        <li><a href="{{url_for('user_profile')}}">Profilo<a></li>
-        <li class="subitem">Squadre
-            <ul class="sublist">
-                {%for team in teams%}
+    <div class="round-container">
 
-                <li> <a href="{{url_for('team_home',team_id=team.id)}}">{{team.name}}</a></li>
-                {%endfor%}
-            </ul>
-        </li>
-        <li><a href="{{url_for('trips_overview',user_id=current_user.id)}}">Panoramica giri</a></li>
-        {%if current_user.teams %}
-        <li><a href="{{url_for('new_trip',user_id=current_user.id)}}">Aggiungi un nuovo giro</a></li>
+        {%if not current_user.profile_picture%}
+        <img src="{{ url_for('serve_image', filepath='app_icon.jpg') }}" class="img-fluid" alt="Popup Image">
+        {%else%}
+        <img src="{{ url_for('serve_image', filepath=current_user.profile_picture) }}" class="img-fluid"
+            alt="Popup Image">
         {%endif%}
-    </ul>
+    </div>
+    <div class="menu-container">
+
+        <i class="fas fa-bars menu-symbol"></i>
+        <span class="menu-text">Menu</span>
+
+    </div>
+    <div class="popup" id="popup">
+        <ul>
+            <li><a href="{{url_for('user_home',username=current_user.username)}}">Home</a></li>
+            <li><a href="{{url_for('user_profile')}}">Profilo<a></li>
+            <li class="subitem">Squadre
+                <ul class="sublist">
+                    {%for team in teams%}
+
+                    <li> <a href="{{url_for('team_home',team_id=team.id)}}">{{team.name}}</a></li>
+                    {%endfor%}
+                </ul>
+            </li>
+            <li><a href="{{url_for('trips_overview',user_id=current_user.id)}}">Panoramica giri</a></li>
+            {%if current_user.teams %}
+            <li><a href="{{url_for('new_trip',user_id=current_user.id)}}">Aggiungi un nuovo giro</a></li>
+            {%endif%}
+        </ul>
+    </div>
+
 </div>
+
 <script>
     var popup = document.querySelector(".popup");
     var popupBtn = document.querySelector(".menu-symbol");
@@ -146,25 +141,17 @@
 {%block columnRight%}
 
 
-{%if not current_user.profile_banner%}
+{%if current_user.profile_banner%}
 <style>
-    .col-md-3.column1 {
-        background-image: url('../images/defaults/default_vertical_banner.png');
-        /* Additional background styles if needed */
-    }
-</style>
-
-{%else%}
-<style>
-    .col-md-3.column1 {
+    .right-column {
         background-image: url("{{ url_for('serve_image', filepath=current_user.profile_banner) }}");
-
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
     }
 </style>
 {%endif%}
 
 <div class="table-box" style="display: inline-block;">
-
     <table class="table table-striped">
 
         <tbody>

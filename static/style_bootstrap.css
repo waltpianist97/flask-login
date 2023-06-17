@@ -15,9 +15,13 @@ body {
 
 .left-column {
     background-color: orange;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
     display: flex;
     flex-direction: column;
+
 }
+
 
 .left-frame {
     position: relative;
@@ -65,6 +69,10 @@ body {
     padding-right: 20px;
     display: flex;
     flex-direction: column;
+    background-image: url('../images/defaults/wallpaper_user_home.jpg');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
 
 }
 
@@ -76,6 +84,8 @@ body {
 
 .right-column {
     background-color: orange;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
     display: flex;
     flex-direction: column;
     /* Add this line */
@@ -93,12 +103,35 @@ body {
 
 .table-box {
     margin-bottom: 20px;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
     padding: 10px;
     border: 1px solid #dee2e6;
     background-color: orange;
     border-radius: 5px;
     overflow-x: auto;
+    position: relative;
+    opacity: 0.7;
+    /* Change to relative */
 
+
+}
+
+.transparent-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    top: 5%;
+    bottom: 50%;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    margin-right: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-bottom: 20px;
 }
 
 .no-gutters [class^="col-"] {

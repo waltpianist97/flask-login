@@ -100,33 +100,35 @@
 
                 {%endif%}
 
+                <div class="transparent-box">
+                    <div class="popup-btn-container">
+                        {%if not current_user.profile_picture%}
+                        <img src="{{ url_for('serve_image', filepath='app_icon.jpg') }}" class="popup-btn"
+                            alt="Popup Image">
+                        {%else%}
+                        <img src="{{ url_for('serve_image', filepath=current_user.profile_picture) }}" class="popup-btn"
+                            alt="Popup Image">
+                        {%endif%}
+                        <i class="fas fa-bars menu-symbol"></i><span class="menu-text">Menu</span>
+                    </div>
+                    <div class="popup" id="popup">
+                        <ul>
+                            <li><a href="{{url_for('user_home',username=current_user.username)}}">Home</a></li>
+                            <li><a href="{{url_for('user_profile')}}">Profilo<a></li>
+                            <li class="subitem">Squadre
+                                <ul class="sublist">
+                                    {%for team in teams%}
 
-                <div class="popup-btn-container">
-                    {%if not current_user.profile_picture%}
-                    <img src="{{ url_for('serve_image', filepath='app_icon.jpg') }}" class="popup-btn"
-                        alt="Popup Image">
-                    {%else%}
-                    <img src="{{ url_for('serve_image', filepath=current_user.profile_picture) }}" class="popup-btn"
-                        alt="Popup Image">
-                    {%endif%}
-                    <i class="fas fa-bars menu-symbol"></i><span class="menu-text">Menu</span>
-                </div>
-                <div class="popup" id="popup">
-                    <ul>
-                        <li><a href="{{url_for('user_home',username=current_user.username)}}">Home</a></li>
-                        <li><a href="{{url_for('user_profile')}}">Profilo<a></li>
-                        <li class="subitem">Squadre
-                            <ul class="sublist">
-                                {%for team in teams%}
+                                    <li> <a href="{{url_for('team_home',team_id=team.id)}}">{{team.name}}</a></li>
+                                    {%endfor%}
+                                </ul>
+                            </li>
+                            <li><a href="{{url_for('trips_overview',user_id=current_user.id)}}">Panoramica giri</a></li>
+                            <li><a href="{{url_for('new_trip',user_id=current_user.id)}}">Aggiungi un nuovo giro</a>
+                            </li>
 
-                                <li> <a href="{{url_for('team_home',team_id=team.id)}}">{{team.name}}</a></li>
-                                {%endfor%}
-                            </ul>
-                        </li>
-                        <li><a href="{{url_for('trips_overview',user_id=current_user.id)}}">Panoramica giri</a></li>
-                        <li><a href="{{url_for('new_trip',user_id=current_user.id)}}">Aggiungi un nuovo giro</a></li>
-
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
                 <script>
                     var popup = document.querySelector(".popup");

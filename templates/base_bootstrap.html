@@ -50,16 +50,17 @@
                 <a class="home-button" href="{{url_for('new_trip',user_id=current_user.id)}}">Aggiungi un nuovo
                     giro</a>
                 {%endif%}
+                <a class="home-button logout-button" href="{{ url_for('logout') }}">Logout</a>
+
             </div>
 
 
-            <a class="logout-button" href="{{ url_for('logout') }}">Logout</a>
             {% endif %}
         </header>
         <div class="row justify-content-center no-gutters">
 
             <!--left column-->
-            <div class="col-md-2 column-border left-column full-height">
+            <div class="col-md-2 column-border left-column">
                 {% block columnLeft %}
                 {% endblock %}
             </div>
