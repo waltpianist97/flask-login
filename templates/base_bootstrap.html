@@ -10,8 +10,8 @@
 </head>
 
 <body>
-    <div class="container-fluid">
-        <header class="bg-dark py-3">
+    <div class="container-fluid no-gutters">
+        <header class="bg-dark py-3 fill-gap">
             {% if current_user.is_anonymous %}
 
             <a class="home-button" href="{{ url_for('index') }}">Home</a>
@@ -57,16 +57,16 @@
 
             {% endif %}
         </header>
-        <div class="row justify-content-center no-gutters">
+        <div class="row  justify-content-center">
 
             <!--left column-->
-            <div class="col-md-2 column-border left-column">
+            <div class="col-md-3 col-lg-2 column-border left-column">
                 {% block columnLeft %}
                 {% endblock %}
             </div>
 
             <!--center column-->
-            <div class="col-md-8 column-border">
+            <div class="col-md-6 col-lg-8  column-border">
                 <div class="center-column-box">
                     {% block columnCenter %}
                     {% endblock %}
@@ -74,14 +74,14 @@
             </div>
 
             <!--right-column-->
-            <div class="col-md-2 column-border right-column">
+            <div class="col-md-3 col-lg-2 column-border right-column">
                 {% block columnRight %}
                 {% endblock %}
             </div>
 
 
         </div>
-        <footer class="bg-dark py-3">
+        <footer class="bg-dark py-3 fill-gap">
 
             <div class="imprint-links">
                 <a href="#">TeamUp</a> | <a href="#">Guida all'uso</a>

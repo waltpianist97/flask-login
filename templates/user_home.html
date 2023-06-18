@@ -1,10 +1,5 @@
 {% extends "base_bootstrap.html" %}
 
-
-
-
-
-
 {%block columnCenter%}
 
 {%if current_user.profile_background%}
@@ -88,50 +83,62 @@
     <div class="round-container">
 
         {%if not current_user.profile_picture%}
-        <img src="{{ url_for('serve_image', filepath='app_icon.jpg') }}" class="img-fluid" alt="Popup Image">
+        <img src="{{ url_for('serve_image', filepath='defaults/app_icon.jpg') }}" class="img-fluid" alt="Popup Image">
         {%else%}
         <img src="{{ url_for('serve_image', filepath=current_user.profile_picture) }}" class="img-fluid"
             alt="Popup Image">
         {%endif%}
     </div>
-    <div class="menu-container">
 
-        <i class="fas fa-bars menu-symbol"></i>
-        <span class="menu-text">Menu</span>
-
-    </div>
-    <div class="popup" id="popup">
-        <ul>
-            <li><a href="{{url_for('user_home',username=current_user.username)}}">Home</a></li>
-            <li><a href="{{url_for('user_profile')}}">Profilo<a></li>
-            <li class="subitem">Squadre
-                <ul class="sublist">
-                    {%for team in teams%}
-
-                    <li> <a href="{{url_for('team_home',team_id=team.id)}}">{{team.name}}</a></li>
-                    {%endfor%}
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Menu
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{{url_for('user_home',username=current_user.username)}}">Home</a></li>
+            <li><a class="dropdown-item" href="{{url_for('user_profile')}}">Profilo</a></li>
+            <li class="dropdown subitem">
+                <a class="dropdown-item dropdown-toggle" href="#" role="button" id="squadreMenu">Squadre</a>
+                <ul class="dropdown-menu" aria-labelledby="squadreMenu">
+                    {% for team in teams %}
+                    <li><a class="dropdown-item" href="{{url_for('team_home',team_id=team.id)}}">{{team.name}}</a></li>
+                    {% endfor %}
                 </ul>
             </li>
-            <li><a href="{{url_for('trips_overview',user_id=current_user.id)}}">Panoramica giri</a></li>
-            {%if current_user.teams %}
-            <li><a href="{{url_for('new_trip',user_id=current_user.id)}}">Aggiungi un nuovo giro</a></li>
-            {%endif%}
+            <li><a class="dropdown-item" href="{{url_for('trips_overview',user_id=current_user.id)}}">Panoramica
+                    giri</a></li>
+            {% if current_user.teams %}
+            <li><a class="dropdown-item" href="{{url_for('new_trip',user_id=current_user.id)}}">Aggiungi un nuovo
+                    giro</a></li>
+            {% endif %}
         </ul>
     </div>
 
 </div>
 
 <script>
-    var popup = document.querySelector(".popup");
-    var popupBtn = document.querySelector(".menu-symbol");
-    popupBtn.addEventListener("click", function () {
-        if (popup.style.display === "block") {
-            popup.style.display = "none";
-        } else {
-            popup.style.display = "block";
-        }
+    var dropdownButton = document.querySelector("#dropdownMenuButton");
+    var dropdownMenu = document.querySelector(".dropdown-menu");
+
+    dropdownButton.addEventListener("click", function () {
+        var isExpanded = dropdownButton.getAttribute("aria-expanded") === "true";
+        dropdownButton.setAttribute("aria-expanded", !isExpanded);
+        dropdownMenu.classList.toggle("show", !isExpanded);
     });
 </script>
+
+
+<script>
+    var squadreMenuItem = document.querySelector("#squadreMenu");
+    var squadreSubMenu = document.querySelector("#squadreMenu + .dropdown-menu");
+
+    squadreMenuItem.addEventListener("click", function (event) {
+        event.preventDefault();
+        squadreSubMenu.classList.toggle("show");
+    });
+</script>
+
 {%endblock%}
 
 

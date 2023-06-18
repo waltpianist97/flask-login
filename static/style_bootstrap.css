@@ -13,13 +13,14 @@ body {
     flex: 1;
 }
 
+
+
 .left-column {
     background-color: orange;
     background-repeat: no-repeat;
     background-size: 100% 100%;
     display: flex;
     flex-direction: column;
-
 }
 
 
@@ -63,8 +64,8 @@ body {
 .center-column-box {
     overflow-y: auto;
     height: 100%;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
+    border-left: 6px solid black;
+    border-right: 6px solid black;
     padding-left: 20px;
     padding-right: 20px;
     display: flex;
@@ -114,8 +115,6 @@ body {
     position: relative;
     opacity: 0.7;
     /* Change to relative */
-
-
 }
 
 .transparent-box {
@@ -137,4 +136,45 @@ body {
 .no-gutters [class^="col-"] {
     padding-left: 0px;
     padding-right: 0px;
+}
+
+
+.fill-gap {
+    margin-bottom: 0;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding: 0;
+}
+
+.dropdown-menu {
+    background-color: black;
+}
+
+.dropdown-menu a {
+    color: white;
+}
+
+.dropdown-menu li {
+    position: relative;
+}
+
+.dropdown-menu .dropdown-submenu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: -7px;
+}
+
+.dropdown-menu .dropdown-submenu-left {
+    right: 100%;
+    left: auto;
+}
+
+.dropdown-menu>li:hover>.dropdown-submenu {
+    display: block;
+}
+
+.btn-primary {
+    background-color: black;
+    border: none
 }
