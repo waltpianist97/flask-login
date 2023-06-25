@@ -312,6 +312,7 @@
     display: inline-block;
     border-radius: 50%;
     overflow: hidden;
+    width: 50%;
 }
 
 .menu-container {

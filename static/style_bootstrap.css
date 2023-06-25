@@ -150,6 +150,11 @@ body {
     background-color: black;
 }
 
+.dropdown-menu.centered {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
 .dropdown-menu a {
     color: white;
 }
@@ -160,7 +165,7 @@ body {
 
 .dropdown-menu .dropdown-submenu {
     display: none;
-    position: absolute;
+    position: relative;
     left: 100%;
     top: -7px;
 }
