@@ -72,18 +72,19 @@
     </form>
 
 </div>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
 <div class="table-box flash-messages" style="width:30%">
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
+
     <ul>
         {% for message in messages %}
         <li>{{ message }}</li>
         {% endfor %}
     </ul>
-    {% endif %}
-    {% endwith %}
-</div>
 
+</div>
+{% endif %}
+{% endwith %}
 <script>
     function sendUsername() {
         var username = document.getElementsByName('username')[0].value;
