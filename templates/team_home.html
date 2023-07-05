@@ -52,7 +52,7 @@
                     </a>
                     {%else%}
                     <a style="color:black"
-                        href="{{url_for('member_view', user_id=ranking['user_id'],team_id=team.id)}}">
+                        href="{{url_for('member_home', user_id=ranking['user_id'],team_id=team.id)}}">
                         <strong>{{ranking["user"]}}</strong>
                     </a>
                     {%endif%}

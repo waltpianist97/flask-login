@@ -1,0 +1,173 @@
+{% extends "base_bootstrap.html" %}
+
+{%block columnCenter%}
+
+{%if user.profile_background%}
+<style>
+    .center-column-box {
+        background-image: url("{{ url_for('serve_image', filepath=user.profile_background) }}");
+
+    }
+</style>
+{%endif%}
+
+
+<div class="table-box" style="width:50%; left:25%">
+    <h1 style="color:red; text-align: center;">I giri di {{user.username}} nel team: {{team.name}}</h1>
+</div>
+<div class=" table-box" style="text-align: center;">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th><strong>Nome del giro</strong></th>
+                <th><strong>Velocità (km/h)</strong></th>
+                <th><strong>Distanza (km)</strong></th>
+                <th><strong>Dislivello (m)</strong></th>
+                <th><strong>Numero di partecipanti</strong></th>
+                <th><strong>Data</strong></th>
+                <th><strong>Prestigio</strong></th>
+                <th><strong>Punteggio</strong></th>
+                {%if role=='team_leader'%}
+
+                <th><strong>Azioni</strong></th>
+                {%endif%}
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for trip in trips %}
+            <tr>
+
+                <td>{{ trip.tripname}}</td>
+                <td>{{ trip.speed }}</td>
+                <td>{{ trip.distance }}</td>
+                <td>{{ trip.elevation }}</td>
+                <td>{{ trip.n_of_partecipants }}</td>
+                <td>{{ trip.recorded_on.strftime("%d/%m/%Y") }}</td>
+                <td>{{ trip.prestige }}</td>
+                <td><strong>{{ trip.score }}</strong></td>
+                {%if role=='team_leader'%}
+                <td>
+
+                    <a href="{{url_for('edit_trip',trip_id=trip.id,user_id=current_user.id)}}"><i
+                            class="fas fa-edit"></i></a>
+                    <a href="{{ url_for('delete_trip', trip_id=trip.id, user_id=current_user.id) }}"><i
+                            class="fas fa-times"></i></a>
+                </td>
+                {%endif%}
+
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{%endblock%}
+
+
+{%block columnLeft%}
+
+{%if user.profile_banner%}
+<style>
+    .left-column {
+        background-image: url("{{ url_for('serve_image', filepath=user.profile_banner) }}");
+
+    }
+</style>
+{%endif%}
+
+<div class="p-2 mx-auto my-auto" style="text-align: center;">
+
+    <div class="round-container">
+
+        {%if not current_user.profile_picture%}
+        <img src="{{ url_for('serve_image', filepath='defaults/app_icon.jpg') }}" class="img-fluid" alt="Popup Image">
+        {%else%}
+        <img src="{{ url_for('serve_image', filepath=current_user.profile_picture) }}" class="img-fluid"
+            alt="Popup Image">
+        {%endif%}
+    </div>
+
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Menu
+        </button>
+        <ul class="dropdown-menu centered" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{{url_for('member_home',user_id=user.id, team_id=team.id)}}">Home</a>
+            </li>
+            <li><a class="dropdown-item"
+                    href="{{url_for('member_profile',user_id=user.id,team_id=team.id)}}">Profilo</a></li>
+        </ul>
+    </div>
+
+</div>
+
+<script>
+    var dropdownButton = document.querySelector("#dropdownMenuButton");
+    var dropdownMenu = document.querySelector(".dropdown-menu");
+
+    dropdownButton.addEventListener("click", function () {
+        var isExpanded = dropdownButton.getAttribute("aria-expanded") === "true";
+        dropdownButton.setAttribute("aria-expanded", !isExpanded);
+        dropdownMenu.classList.toggle("show", !isExpanded);
+    });
+</script>
+
+
+<script>
+    var squadreMenuItem = document.querySelector("#squadreMenu");
+    var squadreSubMenu = document.querySelector("#squadreMenu + .dropdown-menu");
+
+    squadreMenuItem.addEventListener("click", function (event) {
+        event.preventDefault();
+        squadreSubMenu.classList.toggle("show");
+    });
+</script>
+
+
+{%endblock%}
+
+
+{%block columnRight%}
+
+{%if user.profile_banner%}
+<style>
+    .left-column {
+        background-image: url("{{ url_for('serve_image', filepath=user.profile_banner) }}");
+
+    }
+</style>
+{%endif%}
+<div class="table-box p-2 mx-auto my-auto" style="display: inline-block;">
+    <table class="table table-striped">
+
+        <tbody>
+            <tr>
+                <td colspan="2">
+                    <h2> Statistiche</h2>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Totale attività</strong></td>
+                <td>{{stat["activities"]}}</td>
+            </tr>
+            <tr>
+                <td><strong>Distanza complessiva (km)</strong></td>
+                <td>{{stat["total_distance"]}}</td>
+            </tr>
+            <tr>
+                <td><strong>Massimo dislivello (m)</strong></td>
+                <td>{{stat["maximum_elevation"]}}</td>
+            </tr>
+            <tr>
+                <td><strong>Velocità media (km/h)</strong></td>
+
+                <td>{{stat["average_speed"]}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+{%endblock%}

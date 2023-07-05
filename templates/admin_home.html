@@ -29,12 +29,12 @@
                 </td>
                 <td style="text-align: center;">
 
-                    <form method="POST" action="{{ url_for('delete_user', user_id=current_user.id) }}"
-                        onsubmit="return confirmFormSubmission();">
+                    <form method="POST" action="{{ url_for('delete_team', team_id=team.id) }}"
+                        onsubmit="return confirmFormSubmissionTeam();">
                         <input type="submit" value="Elimina">
                         <script>
-                            function confirmFormSubmission() {
-                                return confirm("Sei sicuro di voler eliminare l'account?");
+                            function confirmFormSubmissionTeam() {
+                                return confirm("Sei sicuro di voler eliminare il team?");
                             }
                         </script>
                     </form>
@@ -78,9 +78,16 @@
                     <a href="/view_user_profile_by_admin/{{user.id}}">{{ user.username }}</a>
                 </td>
                 <td style="text-align: center;">
-                    <button>
-                        <a href="/delete_user/{{user.id}}" style="align-content:center; color:black;">Elimina</a>
-                    </button>
+                    <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}"
+                        onsubmit="return confirmFormSubmissionUser();">
+                        <input type="submit" value="Elimina">
+                        <script>
+                            function confirmFormSubmissionUser() {
+                                return confirm("Sei sicuro di voler eliminare l'utente?");
+                            }
+                        </script>
+                    </form>
+
                 </td>
             </tr>
             {% endfor %}

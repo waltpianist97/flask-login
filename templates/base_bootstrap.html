@@ -47,7 +47,7 @@
                 {%endif%}
                 {% endfor %}
                 {%if auth_user_teams%}
-                <a class="home-button" href="{{url_for('new_trip',user_id=current_user.id)}}">Aggiungi un nuovo
+                <a class="home-button" href="{{url_for('new_trip',user_id=current_user.id)}}">Nuovo
                     giro</a>
                 {%endif%}
                 <a class="home-button logout-button" href="{{ url_for('logout') }}">Logout</a>

@@ -92,7 +92,7 @@
             {% for team_member in team_members %}
             <tr>
                 <td><a
-                        href="{{url_for('member_view',user_id = team_member['user'].id, team_id= team_member['team_id'])}}">{{
+                        href="{{url_for('member_home',user_id = team_member['user'].id, team_id= team_member['team_id'])}}">{{
                         team_member['user'].username }}
                         {%if team_member['user'].username == current_user.username%} (tu){%endif%}</a>
                 </td>
@@ -148,7 +148,7 @@
             {% for request in requests_to_join %}
             <tr>
                 <td>
-                    <a href="{{ url_for('non_member_view', user_id=request['user'].id) }}">{{
+                    <a href="{{ url_for('non_member_home', user_id=request['user'].id) }}">{{
                         request['user'].username }}</a>
                 </td>
                 <td style="display: flex; justify-content: center; align-items: center;">

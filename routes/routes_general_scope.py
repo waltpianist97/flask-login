@@ -103,7 +103,7 @@ def new_trip(user_id,team_id=None):
         if user == current_user:
             return redirect(url_for('trips_overview',user_id=user.id))
         else:
-            return redirect(url_for('member_view',team_id=form.team.data,user_id=user.id))
+            return redirect(url_for('member_home',team_id=form.team.data,user_id=user.id))
         
     return render_template('new_trip.html',title="Add new trip", form = form, teams= teams)
 

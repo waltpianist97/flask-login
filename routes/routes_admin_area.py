@@ -91,14 +91,16 @@ def view_user_profile_by_admin(user_id):
     return render_template("view_user_profile_by_admin.html",user=user,team_roles=team_roles)
  
 
-@app.route("/delete_team/<int:team_id>")
+@app.route("/delete_team/<int:team_id>",methods=['GET','POST'])
 @login_required
 def delete_team(team_id):
     team = Team.query.filter_by(id=team_id).first()
     db.session.delete(team)
     db.session.commit()
-    return redirect(url_for("admin_home",username=current_user.username))
-
+    if current_user._is_admin:
+        return redirect(url_for("admin_home",username=current_user.username))
+    else:
+        return redirect(url_for("index"))
 
 @app.route('/new_team',methods=['GET', 'POST'])
 @login_required

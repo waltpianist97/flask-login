@@ -1,85 +1,88 @@
+<!DOCTYPE html>
 <html>
 
 <head>
-
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_bootstrap.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles_page.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    {% if title %}
-    <title>{{ title }}</title>
-    {% else %}
-    <title>Benvenuto su TeamUp</title>
-    {% endif %}
 </head>
 
 <body>
+    <div class="container-fluid no-gutters">
+        <header class="bg-dark py-3 fill-gap">
+            {% if current_user.is_anonymous %}
 
-    <div class="header">
-        {% if current_user.is_anonymous %}
-        <a class="home-button" href="{{ url_for('index') }}">Home</a>
-        {% else %}
-        <div class="teams-container">
-            <!--home management-->
-            {% if current_user._is_admin %}
-            <a class="home-button" href="{{ url_for('admin_home', username=current_user.username) }}">Home</a>
+            <a class="home-button" href="{{ url_for('index') }}">Home</a>
             {% else %}
-            <a class="home-button" href="{{ url_for('user_home', username=current_user.username) }}">Home</a>
-            {% endif %}
+            <div class="teams-container">
+                <!--home management-->
+                {% if current_user._is_admin %}
+                <a class="home-button" href="{{ url_for('admin_home', username=current_user.username) }}">Home</a>
+                {% else %}
+                <a class="home-button" href="{{ url_for('user_home', username=current_user.username) }}">Home</a>
+                {% endif %}
 
-            {% set auth_user_teams = current_user.teams %}
+                {% set auth_user_teams = current_user.teams %}
 
-            {% for team in auth_user_teams %}
-            {% if current_user in team.get_leaders() %}
+                {% for team in auth_user_teams %}
+                {% if current_user in team.get_leaders() %}
 
 
-            <div class="home-button-menu">
-                <a href="{{ url_for('team_home', team_id=team.id) }}">{{ team.name }}</a>
-                <div class="sublist-home">
-                    <ul>
-                        <li><a href="{{ url_for('manage_team', team_id=team.id) }}">Gestisci squadra</a></li>
-                        <li><a href="{{ url_for('manage_trips', team_id=team.id) }}">Gestisci giri</a></li>
-                    </ul>
+                <div class="home-button-menu">
+                    <a href="{{ url_for('team_home', team_id=team.id) }}">{{ team.name }}</a>
+                    <div class="sublist-home">
+                        <ul>
+                            <li><a href="{{ url_for('manage_team', team_id=team.id) }}">Gestisci squadra</a></li>
+                            <li><a href="{{ url_for('manage_trips', team_id=team.id) }}">Gestisci giri</a></li>
+                        </ul>
+                    </div>
                 </div>
+
+
+                {%else%}
+                <a class="home-button" href="{{ url_for('team_home', team_id=team.id) }}">{{ team.name }}</a>
+
+                {%endif%}
+                {% endfor %}
+                {%if auth_user_teams%}
+                <a class="home-button" href="{{url_for('new_trip',user_id=current_user.id)}}">Nuovo
+                    giro</a>
+                {%endif%}
+                <a class="home-button logout-button" href="{{ url_for('logout') }}">Logout</a>
+
             </div>
 
 
-            {%else%}
-            <a class="home-button" href="{{ url_for('team_home', team_id=team.id) }}">{{ team.name }}</a>
+            {% endif %}
+        </header>
+        <div class="row  justify-content-center">
 
-            {%endif%}
-            {% endfor %}
-            {%if auth_user_teams%}
-            <a class="home-button" href="{{url_for('new_trip',user_id=current_user.id)}}">Aggiungi un nuovo
-                giro</a>
-            {%endif%}
+            <div class="col-12 center-column-box">
+                {% block content %}
+                {% endblock %}
+            </div>
+
         </div>
+        <footer class="bg-dark py-3 fill-gap">
 
+            <div class="imprint-links">
+                <a href="#">TeamUp</a> | <a href="#">Guida all'uso</a>
+            </div>
+            <div id="date-time">
+                <script>
+                    function updateDateTime() {
+                        var dateTime = new Date();
+                        var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', locale: 'it-IT' };
+                        var dateTimeStr = dateTime.toLocaleDateString(undefined, options);
+                        document.getElementById("date-time").innerHTML = dateTimeStr;
+                    }
 
-        <a class="logout-button" href="{{ url_for('logout') }}">Logout</a>
-        {% endif %}
-
-
-    </div>
-    <div class="content-container">{% block content %}{% endblock %}</div>
-    <div class="footer">
-        <div class="imprint-links">
-            <a href="#">TeamUp</a> | <a href="#">Guida all'uso</a>
-        </div>
-        <div id="date-time">
-            <script>
-                function updateDateTime() {
-                    var dateTime = new Date();
-                    var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', locale: 'it-IT' };
-                    var dateTimeStr = dateTime.toLocaleDateString(undefined, options);
-                    document.getElementById("date-time").innerHTML = dateTimeStr;
-                }
-
-                setInterval(updateDateTime, 1000);
-            </script>
-        </div>
-    </div>
+                    setInterval(updateDateTime, 1000);
+                </script>
+            </div>
+        </footer>
 </body>
 
 </html>
