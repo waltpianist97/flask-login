@@ -14,7 +14,11 @@
             <h1 style="color:red">Registrazione</h1>
 
             <tbody>
-
+                <style>
+                    .shorter-input {
+                        width: 200px;
+                    }
+                </style>
 
                 {{ form.hidden_tag() }}
                 <tr>
@@ -22,7 +26,8 @@
                         {{ form.username.label }}
                     </td>
                     <td>
-                        {{ form.username(size=32) }}
+
+                        {{ form.username(size=32,class_="shorter-input") }}
                     </td>
                 </tr>
                 <tr>
@@ -37,7 +42,7 @@
                         {{ form.email.label }}
                     </td>
                     <td>
-                        {{ form.email(size=32) }}
+                        {{ form.email(size=32,class_="shorter-input") }}
                     </td>
                 </tr>
                 <tr>
@@ -52,7 +57,7 @@
                         {{ form.password.label }}
                     </td>
                     <td>
-                        {{ form.password(size=32) }}
+                        {{ form.password(size=32,class_="shorter-input") }}
                     </td>
                 </tr>
                 <tr>
@@ -67,7 +72,7 @@
                         {{ form.password2.label }}
                     </td>
                     <td>
-                        {{ form.password2(size=32) }}
+                        {{ form.password2(size=32,class_="shorter-input") }}
                     </td>
                 </tr>
                 <tr>

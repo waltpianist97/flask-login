@@ -10,7 +10,7 @@
     }
 
     td {
-        max-width: 50pxs;
+        max-width: 25px;
         /* Adjust the max width as needed */
         overflow: hidden;
         text-overflow: ellipsis;
@@ -74,15 +74,16 @@
 </div>
 {% with messages = get_flashed_messages() %}
 {% if messages %}
-<div class="table-box flash-messages" style="width:30%">
+<div class="table-box flash-messages" style="left:1%;width:40%;">
+
 
     <ul>
         {% for message in messages %}
         <li>{{ message }}</li>
         {% endfor %}
     </ul>
-
 </div>
+
 {% endif %}
 {% endwith %}
 <script>

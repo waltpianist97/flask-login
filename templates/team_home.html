@@ -18,7 +18,7 @@
 </style>
 {%endif%}
 
-<div class="table-box" style="display: inline-block; width:50%;margin-left: 25%;">
+<div class="table-box" style="display: inline-block; width:70%;margin-left: 15%;">
     {%if role%}
     <table class="table table-striped">
         <h1 style="color:red">Classifica nel team: {{team.name}}</h1>
@@ -103,7 +103,7 @@
 {%if not current_user._is_admin%}
 {%if team.users%}
 {%if current_user not in team.users%}
-<div class=table-box style="display: inline-block; width: 40%; margin-left:30%; text-align:center;">
+<div class=table-box style="display: inline-block; width: 70%; margin-left:15%; text-align:center;">
     <h2>Non hai accesso al {{team.name}}, per favore richiedi la registrazione al team!</h2>
 
     {%if not request%}
@@ -120,7 +120,7 @@
 </div>
 {%endif%}
 {%else%}
-<div class=table-box style="display: inline-block; width: 40%; margin-left:30%; text-align:center;">
+<div class=table-box style="display: inline-block; width: 70%; margin-left:15%; text-align:center;">
     <h2>La squadra non ha membri, registrati per primo!</h2>
     <form action="{{url_for('enroll_directly', user_id = current_user.id, team_id=team.id)}}" method="POST"
         class="form-container">
