@@ -1,133 +1,215 @@
-{% extends "base.html" %}
+{% extends "base_bootstrap.html" %}
 
-{% block content %}
-<div class="main">
-    <div class="box">
-        {%if role%}
-        <table class="styled-table">
-            <caption>
-                <h1 style="color:red">{{team.name}} ranking</h1>
-            </caption>
-            <thead>
-                <tr>
-                    <th>Rank</th>
-                    <th>User</th>
-                    <th>Total Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for place, ranking in ranking_list %}
-                <tr>
-                    <td>
-                        {% if place+1 == 1 %}
-                        &#129351;
-                        {% elif place+1 == 2 %}
-                        &#129352;
-                        {% elif place+1 == 3 %}
-                        &#129353;
-                        {% else %}
-                        {{ place+1 }}
-                        {% endif %}
-                    </td>
+{%block columnCenter%}
+
+{%if team.team_background%}
+<style>
+    .center-column-box {
+        background-image: url("{{ url_for('serve_image', filepath=team.team_background) }}");
+
+    }
+</style>
+{%else%}
+<style>
+    .center-column-box {
+        background-image: url('../images/defaults/wallpaper_team_home.jpg');
+
+    }
+</style>
+{%endif%}
+
+<div class="table-box" style="display: inline-block; width:70%;margin-left: 15%;">
+    {%if role%}
+    <table class="table table-striped">
+        <h1 style="color:red">Classifica nel team: {{team.name}}</h1>
+        <thead>
+            <tr>
+                <th>Posizione</th>
+                <th>Membro</th>
+                <th>Punteggio totale</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for place, ranking in ranking_list %}
+            <tr>
+                <td>
+                    {% if place+1 == 1 %}
+                    &#129351;
+                    {% elif place+1 == 2 %}
+                    &#129352;
+                    {% elif place+1 == 3 %}
+                    &#129353;
+                    {% else %}
+                    {{ place+1 }}
+                    {% endif %}
+                </td>
 
 
-                    <td>
-                        {%if ranking["user"] == current_user.username%}
-                        <a href="{{url_for('trips_overview', user_id=ranking['user_id'])}}">
-                            {{ranking["user"]}} (you)
-                        </a>
-                        {%else%}
-                        <a href="{{url_for('member_view', user_id=ranking['user_id'],team_id=team.id)}}">
-                            {{ranking["user"]}}
-                        </a>
-                        {%endif%}
+                <td>
+                    {%if ranking["user"] == current_user.username%}
+                    <a style="color:black" href="{{url_for('trips_overview', user_id=ranking['user_id'])}}">
+                        <strong>{{ranking["user"]}} (tu)</strong>
+                    </a>
+                    {%else%}
+                    <a style="color:black"
+                        href="{{url_for('member_home', user_id=ranking['user_id'],team_id=team.id)}}">
+                        <strong>{{ranking["user"]}}</strong>
+                    </a>
+                    {%endif%}
 
-                    </td>
-                    <td>{{ ranking["total score"] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {%else%}
-        <table class="styled-table">
-            <thead>
-                <tr>
-                    <th>User</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in team.users %}
-                <tr>
-                    <td>
-                        {{user.username}}
-                    </td>
-                </tr>
-                {%endfor%}
-            </tbody>
-        </table>
-
-        {%endif%}
-    </div>
-    {%if not current_user._is_admin%}
-    <br>
-    {%if current_user not in team.users%}
-    <center>
-        <h2>You don't have full access to the {{team.name}} information, please apply</h2>
-        <div class="post-container">
-            {%if not request%}
-            <form action="{{url_for('request_enrollment_to_team', team_id=team.id)}}" method="POST"
-                class="form-container">
-                <input type="submit" class="enroll-button" value="Request Enrollment">
-            </form>
-            {%else%}
-            <form action="{{url_for('withdraw_request_enrollment', request_id = request.id, team_id=team.id)}}"
-                method="POST" class="form-container">
-
-                <input type="submit" class="enroll-button" value="Withdraw request">
-            </form>
-            {%endif%}
-
-        </div>
-    </center>
+                </td>
+                <td><strong>{{ ranking["total score"] }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <td colspan="3" style="text-align: center;">
+                <form method="POST"
+                    action="{{ url_for('unenroll_from_team', team_id=team.id, user_id=current_user.id) }}"
+                    onsubmit="return confirmFormSubmission();">
+                    <input type="hidden" name="user_id" value="{{ current_user.id }}">
+                    <input type="submit" value="Deregistrati">
+                    <script>
+                        function confirmFormSubmission() {
+                            return confirm("Sei sicuro di deregistrarti dal team?");
+                        }
+                    </script>
+                </form>
+            </td>
+        </tfoot>
+    </table>
+    {%else%}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Utente</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in team.users %}
+            <tr>
+                <td>
+                    {{user.username}}
+                </td>
+            </tr>
+            {%endfor%}
+        </tbody>
+    </table>
     {%endif%}
-    {%endif%}
+
 
 </div>
 
-<div class="left-sidebar">
-    <div class="popup-btn-container">
+{%if not current_user._is_admin%}
+{%if team.users%}
+{%if current_user not in team.users%}
+<div class=table-box style="display: inline-block; width: 70%; margin-left:15%; text-align:center;">
+    <h2>Non hai accesso al {{team.name}}, per favore richiedi la registrazione al team!</h2>
+
+    {%if not request%}
+    <form action="{{url_for('request_enrollment_to_team', team_id=team.id)}}" method="POST" class="form-container">
+        <input type="submit" value="Richiedi registrazione" style="align-self: center;">
+    </form>
+    {%else%}
+    <form action="{{url_for('withdraw_request_enrollment', request_id = request.id, team_id=team.id)}}" method="POST"
+        class="form-container">
+
+        <input type="submit" value="Ritira richiesta" style="align-self: center;">
+    </form>
+    {%endif%}
+</div>
+{%endif%}
+{%else%}
+<div class=table-box style="display: inline-block; width: 70%; margin-left:15%; text-align:center;">
+    <h2>La squadra non ha membri, registrati per primo!</h2>
+    <form action="{{url_for('enroll_directly', user_id = current_user.id, team_id=team.id)}}" method="POST"
+        class="form-container">
+        <input type="submit" value="Registrati">
+
+    </form>
+</div>
+{%endif%}
+{%endif%}
+
+{%endblock%}
+
+
+
+{%block columnRight%}
+{%if team.team_banner%}
+<style>
+    .right-column {
+        background-image: url("{{ url_for('serve_image', filepath=team.team_banner) }}");
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+    }
+</style>
+{%endif%}
+
+{%if team.team_motto%}
+<div class="p-2 mx-auto my-auto">
+
+    <img src="{{ url_for('serve_image', filepath=team.team_motto) }}" alt="motto" class="img-fluid ">
+</div>
+{%endif%}
+{%endblock%}
+
+{%block columnLeft%}
+
+
+{%if team.team_banner%}
+<style>
+    .left-column {
+        background-image: url("{{ url_for('serve_image', filepath=team.team_banner) }}");
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+    }
+</style>
+{%endif%}
+
+<div class="p-2 mx-auto my-auto" style="text-align: center;">
+    <div class="round-container">
+
         {%if not team.team_picture%}
-        <img src="{{ url_for('static', filename='images/app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
+        <img src="{{ url_for('serve_image', filepath='defaults/app_icon.jpg') }}" class="img-fluid" alt="Popup Image">
         {%else%}
-        <img src="data:image/png;base64,{{ team.team_picture|b64encode }}" class="popup-btn" alt="Popup Image">
+        <img src="{{ url_for('serve_image', filepath=team.team_picture) }}" class="img-fluid" alt="Popup Image">
         {%endif%}
-        <i class="fas fa-bars menu-symbol"></i>
     </div>
-    <div class="popup" id="popup">
-        <ul>
-            <li><a href="{{url_for('team_home',team_id=team.id)}}">Team home</a></li>
-            <li><a href="{{url_for('team_profile',team_id=team.id)}}">Team profile</a></li>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Menu
+        </button>
+        <ul class="dropdown-menu centered" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{{url_for('team_home',team_id=team.id)}}">Home</a></li>
+            <li><a class="dropdown-item" href="{{url_for('team_profile',team_id=team.id)}}">Profilo</a></li>
             {%if role=="team_leader"%}
-            <li><a href="{{url_for('manage_team',team_id=team.id)}}">Manage team</a></li>
-            <li><a href="{{url_for('manage_trips',team_id=team.id)}}">Manage trips</a></li>
+            <li><a class="dropdown-item" href="{{url_for('manage_team',team_id=team.id)}}">Gestisci squadra</a></li>
+            <li><a class="dropdown-item" ref="{{url_for('manage_trips',team_id=team.id)}}">Gestisci giri</a></li>
             {%endif%}
         </ul>
     </div>
     <script>
-        var popup = document.querySelector(".popup");
-        var popupBtn = document.querySelector(".popup-btn");
-        popupBtn.addEventListener("click", function () {
-            if (popup.style.display === "block") {
-                popup.style.display = "none";
-            } else {
-                popup.style.display = "block";
-            }
+        var dropdownButton = document.querySelector("#dropdownMenuButton");
+        var dropdownMenu = document.querySelector(".dropdown-menu");
+
+        dropdownButton.addEventListener("click", function () {
+            var isExpanded = dropdownButton.getAttribute("aria-expanded") === "true";
+            dropdownButton.setAttribute("aria-expanded", !isExpanded);
+            dropdownMenu.classList.toggle("show", !isExpanded);
         });
     </script>
 
-</div>
 
-<div class="right-sidebar">
+    <script>
+        var squadreMenuItem = document.querySelector("#squadreMenu");
+        var squadreSubMenu = document.querySelector("#squadreMenu + .dropdown-menu");
 
+        squadreMenuItem.addEventListener("click", function (event) {
+            event.preventDefault();
+            squadreSubMenu.classList.toggle("show");
+        });
+    </script>
 </div>
-{% endblock %}
+{%endblock%}

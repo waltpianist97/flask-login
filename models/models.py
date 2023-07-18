@@ -4,6 +4,8 @@ from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import db
+import os
+import shutil
 
 class TeamUserAssociation(db.Model):
     __tablename__ = 'team_user_association'
@@ -11,7 +13,7 @@ class TeamUserAssociation(db.Model):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'))
     team_id = Column(Integer, ForeignKey('team.id', ondelete='CASCADE'))
-    role =Column(String)
+    role =Column(String(140))
     join_date = Column(DateTime)
     current_ranking = Column(Integer)
 
@@ -34,7 +36,10 @@ class User(db.Model,UserMixin,AdminMixin):
     trips = relationship('Trip',backref='user',lazy='dynamic',cascade="all, delete-orphan")
     teams = relationship('Team', secondary="team_user_association", back_populates='users')
     join_requests = relationship("RequestsToJoinTeam", back_populates="user", cascade="all, delete-orphan")
-    profile_picture = Column(BLOB)
+    profile_picture = Column(String(140))
+    profile_background = Column(String(140))
+    profile_banner = Column(String(140))
+
     _is_admin = Column(Boolean,nullable=True)
 
     def set_password(self,password):
@@ -43,6 +48,7 @@ class User(db.Model,UserMixin,AdminMixin):
     def check_password(self,password):
         return check_password_hash(self.password_hash, password)
     
+        
     def get_role_in_team(self, team_id):
         user_associated = TeamUserAssociation.query.filter_by(team_id=team_id, user_id=self.id).first()
         if user_associated:
@@ -62,6 +68,18 @@ class User(db.Model,UserMixin,AdminMixin):
             result.append({"team_name": team.name,"team_id":team.id, "trips_by_team": trips_in_team})
         return result
 
+    def create_pictures_folder(self):
+        current_file_path = os.path.realpath(__file__)
+        parent_folder = os.path.dirname(os.path.dirname(current_file_path))
+        pics_folder_path = f"{parent_folder}/images/users/{self.username}"
+        os.mkdir(pics_folder_path)
+    
+    def delete_pictures_folder(self):
+        current_file_path = os.path.realpath(__file__)
+        parent_folder = os.path.dirname(os.path.dirname(current_file_path))
+        pics_folder_path = f"{parent_folder}/images/users/{self.username}"
+        if os.path.exists(pics_folder_path):
+            shutil.rmtree(pics_folder_path)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -77,18 +95,22 @@ class Trip(db.Model):
     description = Column(String(140))
     recorded_on = Column(DateTime, index=True, default=datetime.utcnow)
     n_of_partecipants = Column(Integer, nullable=False, default=1)
-    placement = Column(Integer)
     user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"))
     team_id = Column(Integer, ForeignKey('team.id', ondelete="CASCADE"))
     score = Column(Integer,default=0)
     is_approved = Column(Boolean,default=False)
-
+    placements = relationship("PlacementsInTrip", backref="trip", cascade="all, delete-orphan")
+    n_of_placements = Column(Integer)
+    
     def __repr__(self):
         return '<Trip {}>'.format(self.description)
 
     def get_user(self):
         return User.query.get(self.user_id)
     
+    def get_team(self):
+        return Team.query.get(self.team_id)
+
     @staticmethod
     def calculate_score(v,dx,dz,pr,np,piazzamenti):
         """dx: distance in km,
@@ -104,7 +126,15 @@ class Trip(db.Model):
 
         p_f_o = punteggio_finale_o(v,dx,dz,pr)
         return punteggio_finale_f(p_f_o,np,piazzamenti)
-        
+
+    def get_placements(self):
+        return PlacementsInTrip.query.filter_by(trip_id=self.id).all()
+
+class PlacementsInTrip(db.Model):
+    id = Column(Integer, primary_key=True)
+    trip_id = Column(Integer, ForeignKey('trip.id', ondelete="CASCADE"))
+    place = Column(Integer)
+
 class Team(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(140))
@@ -112,7 +142,11 @@ class Team(db.Model):
     users = relationship('User', secondary="team_user_association", back_populates='teams')
     join_requests = relationship("RequestsToJoinTeam", back_populates="team", cascade="all, delete-orphan")
     description = Column(String(140))
-    team_picture = Column(BLOB)
+    team_picture = Column(String(140))
+    team_background = Column(String(140))
+    team_banner = Column(String(140))
+    team_motto = Column(String(140))
+
     def __repr__(self):
         return '<Team {}>'.format(self.description)
 
@@ -121,13 +155,30 @@ class Team(db.Model):
         db.session.add(t_u_association)
         db.session.commit()
 
+    def get_leaders(self):
+        leaders = User.query.join(TeamUserAssociation).filter(TeamUserAssociation.team_id == self.id, TeamUserAssociation.role == "team_leader").all()
+        return leaders
+    
+    def create_pictures_folder(self):
+        current_file_path = os.path.realpath(__file__)
+        parent_folder = os.path.dirname(os.path.dirname(current_file_path))
+        pics_folder_path = f"{parent_folder}/images/teams/{self.name}"
+        os.mkdir(pics_folder_path)
+        
+    def delete_pictures_folder(self):
+        current_file_path = os.path.realpath(__file__)
+        parent_folder = os.path.dirname(os.path.dirname(current_file_path))
+        pics_folder_path = f"{parent_folder}/images/teams/{self.name}"
+        if os.path.exists(pics_folder_path):
+            shutil.rmtree(pics_folder_path)
+
 class RequestsToJoinTeam(db.Model):
     __tablename__ = 'requests_to_join_team'
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'))
     team_id = Column(Integer, ForeignKey('team.id', ondelete='CASCADE'))
-    status = Column(String)
+    status = Column(String(140))
     request_date = Column(DateTime)
 
     user = relationship("User", back_populates="join_requests")

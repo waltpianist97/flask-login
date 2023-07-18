@@ -5,8 +5,10 @@ from sqlalchemy import or_, and_, desc, func
 from models import User, Trip, Team, TeamUserAssociation, RequestsToJoinTeam
 from forms import *
 from werkzeug.urls import url_parse
-from datetime import datetime, timedelta
-
+from datetime import datetime
+from tools import send_email_utility,AUTO_MAIL, PictureUploader
+import os
+from pathlib import Path
 
 @app.route('/user_home/<username>',methods=['GET', 'POST'])
 @login_required
@@ -40,12 +42,44 @@ def user_home(username):
 
     return render_template('user_home.html', user=user,teams=teams,new_enrollments=message, last_trips=last_trips,stat=stat)
 
+@app.route('/delete_file/<target>/<file_db_column>/<path:filepath>', methods=['GET', 'POST'])
+@app.route('/delete_file/<target>/<file_db_column>/<path:filepath>/<int:team_id>', methods=['GET', 'POST'])
+@login_required
+def delete_file(target,file_db_column,filepath,team_id=None):
+
+    picture_uploader = None
+
+    if not team_id:
+        picture_uploader = PictureUploader(target,current_user.username)
+        picture_uploader.delete_file(filepath)
+        if hasattr(current_user, file_db_column):
+            setattr(current_user, file_db_column, None)
+            db.session.commit() 
+        return redirect(url_for('user_profile'))
+
+    else:
+        team = Team.query.get(team_id)
+        picture_uploader = PictureUploader(target,team.name)
+        picture_uploader.delete_file(filepath)
+        if hasattr(team, file_db_column):
+            setattr(team, file_db_column, None)
+            db.session.commit() 
+        return redirect(url_for('team_profile',team_id=team_id))
+
+
+
+
+
+
 @app.route('/user_profile', methods=['GET', 'POST'])
 @login_required
 def user_profile():
     user = User.query.get(current_user.id)
     form = ProfileForm(obj=user)
     teams = Team.query.all()
+    picture_uploader = PictureUploader("users",current_user.username)
+
+
     if form.validate_on_submit():
         # Handle profile picture upload
         user.username = form.username.data
@@ -56,21 +90,39 @@ def user_profile():
         user.phone_number = form.phone_number.data
      
         if form.profile_picture.data:
-            user.profile_picture = form.profile_picture.data.read()
+            file = form.profile_picture.data
+            picture_uploader.delete_file(user.profile_picture)
+            filename = picture_uploader.load_file(file)
+            user.profile_picture = f'users/{current_user.username}/{filename}'
+
+        if form.profile_background.data:
+            file = form.profile_background.data
+            picture_uploader.delete_file(user.profile_background)
+            filename = picture_uploader.load_file(file)
+            user.profile_background = f'users/{current_user.username}/{filename}'
+
+        if form.profile_banner.data:
+            file = form.profile_banner.data
+            picture_uploader.delete_file(user.profile_banner)
+            filename = picture_uploader.load_file(file)
+            user.profile_banner = f'users/{current_user.username}/{filename}'
 
 
         db.session.commit()
-        flash('Your profile has been updated!', 'success')
+        flash("Il tuo profilo e' stato aggiornato!", 'success')
         return redirect(url_for('user_profile'))
     return render_template('user_profile.html', form=form,teams=teams)
 
+
 @app.route('/trips_overview/<int:user_id>',methods=['GET', 'POST'])
+@login_required
 def trips_overview(user_id):
     
     user = User.query.filter_by(id=user_id).first()
     result=user.group_user_trips_by_team()
+    teams = Team.query.all()
 
-    return render_template('trips_overview.html', user=user, trips_groups=result)
+    return render_template('trips_overview.html', user=user, trips_groups=result,teams=teams)
  
 
 
@@ -86,8 +138,15 @@ def unenroll_from_team(team_id,user_id):
         [db.session.delete(trip) for trip in trips]
         team.users.remove(user)
         db.session.commit()
-    
-    return redirect(url_for("manage_team",team_id=team_id))
+        
+        send_email_utility("Deregistrazione dal team",f"Sei stato deregistrato dal team {team.name}!",AUTO_MAIL,user.email)
+    if current_user._is_admin:
+        return redirect(url_for("view_user_profile_by_admin",user_id=user.id))
+    else:
+        if current_user == user:
+            return redirect(url_for("team_home",team_id=team_id))
+        else:   
+            return redirect(url_for("manage_team",team_id=team_id))
 
 
 @app.route('/request_enrollment_to_team/<int:team_id>',methods=['GET', 'POST'])
@@ -100,10 +159,13 @@ def request_enrollment_to_team(team_id):
         return redirect(url_for("team_home",team_id=team_id))
 
     req = RequestsToJoinTeam(team_id = team_id,user_id = current_user.id,status="pending",request_date=datetime.now())
+
     if current_user not in team.users:
         db.session.add(req)
         db.session.commit()
 
+        emails_leaders = [tl.email for tl in team.get_leaders()]
+        send_email_utility('Richiesta di registrazione nel team', f"{current_user.username} ha richiesto di registrarsi nel {team.name}, controlla la tua pagina 'gestisci squadra'!",AUTO_MAIL,emails_leaders)
         return redirect(url_for("team_home",team_id=team_id,requests_to_join=req))
 
 @app.route('/withdraw_request_enrollment/<int:request_id>/<int:team_id>',methods=['GET', 'POST'])

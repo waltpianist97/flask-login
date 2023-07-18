@@ -4,4 +4,5 @@
 meetings_notes/
 *.ipynb
 scripts/
-images/
+images/users
+images/teams

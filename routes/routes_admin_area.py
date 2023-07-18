@@ -5,12 +5,10 @@ from sqlalchemy import or_, and_, desc, func
 from models import User, Trip, Team, TeamUserAssociation, RequestsToJoinTeam
 from forms import *
 from werkzeug.urls import url_parse
-import secrets
 from datetime import datetime, timedelta
-import smtplib
 from tools import AUTO_MAIL, send_email_utility
-
-#%% ADMIN SECTION
+import shutil
+import os
 
 #%% ADMIN SECTION
 @app.route('/admin_home',methods=['GET', 'POST'])
@@ -39,14 +37,15 @@ def new_user():
     if form.validate_on_submit():
         user_check = User.query.filter(or_(User.email==form.email.data, User.username==form.username.data)).first()
         if user_check:
-            flash('The user already exists, please register under different email and/or username!')
+            flash("L'utente esiste! Provare uno username e/o una password differente.")
             return redirect(url_for('new_user'))
         
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
+        user.create_pictures_folder()
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!')
+        flash('Congratulazioni, registrazione andata a buon fine!')
         return redirect(url_for('admin_home',username = user.username))
 
     return render_template('new_user.html', title='Register new user', form=form)
@@ -71,13 +70,15 @@ def enroll_directly(team_id,user_id):
 
     db.session.commit()
 
-    
-    return redirect(url_for("admin_home",username=current_user.username))
+    if current_user._is_admin:
+        return redirect(url_for("view_user_profile_by_admin",user_id=user.id))
+    else:
+        return redirect(url_for("team_home",team_id=team.id))
 
 
-@app.route("/view_user_profile_by_TL/<int:user_id>")
+@app.route("/view_user_profile_by_admin/<int:user_id>")
 @login_required
-def view_user_profile_by_TL(user_id):
+def view_user_profile_by_admin(user_id):
     user = User.query.get(user_id)
     teams= Team.query.all()
     team_roles = []
@@ -87,17 +88,20 @@ def view_user_profile_by_TL(user_id):
         if t_r: 
             role=t_r.role
         team_roles.append({"team":team,"team_role":role})
-    return render_template("view_user_profile_by_TL.html",user=user,team_roles=team_roles)
+    return render_template("view_user_profile_by_admin.html",user=user,team_roles=team_roles)
  
 
-@app.route("/delete_team/<int:team_id>")
+@app.route("/delete_team/<int:team_id>",methods=['GET','POST'])
 @login_required
 def delete_team(team_id):
     team = Team.query.filter_by(id=team_id).first()
+    team.delete_pictures_folder()
     db.session.delete(team)
     db.session.commit()
-    return redirect(url_for("admin_home",username=current_user.username))
-
+    if current_user._is_admin:
+        return redirect(url_for("admin_home",username=current_user.username))
+    else:
+        return redirect(url_for("index"))
 
 @app.route('/new_team',methods=['GET', 'POST'])
 @login_required
@@ -108,21 +112,24 @@ def new_team():
     form = NewTeamForm()
     if form.validate_on_submit():
         team = Team(name=form.name.data,description=form.description.data)
-       
+        team.create_pictures_folder()
         db.session.add(team)
         db.session.commit()
-        flash('New team registered!')
+        flash('Nuovo team registrato!')
         return redirect(url_for('admin_home',username = current_user.username))
 
     return render_template('new_team.html',title="Add new team", form = form )
 
 
-@app.route("/delete_user/<int:user_id>")
+@app.route("/delete_user/<int:user_id>",methods=['GET','POST'])
 @login_required
 def delete_user(user_id):
     user = User.query.filter_by(id=user_id).first()
+    user.delete_pictures_folder()
     db.session.delete(user)
     db.session.commit()
+
+
     if current_user._is_admin:
         return redirect(url_for("admin_home",username=current_user.username))
     else:

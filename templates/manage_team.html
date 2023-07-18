@@ -1,139 +1,210 @@
-{% extends "base.html" %}
+{% extends "base_bootstrap.html" %}
 
-{% block content %}
-<div class="left-sidebar">
-    <div class="popup-btn-container">
+{%block columnLeft%}
+
+{%if team.team_banner%}
+<style>
+    .left-column {
+        background-image: url("{{ url_for('serve_image', filepath=team.team_banner) }}");
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+    }
+</style>
+{%endif%}
+
+<div class="p-2 mx-auto my-auto" style="text-align: center;">
+    <div class="round-container">
+
         {%if not team.team_picture%}
-        <img src="{{ url_for('static', filename='images/app_icon.jpg') }}" class="popup-btn" alt="Popup Image">
+        <img src="{{ url_for('serve_image', filepath='defaults/app_icon.jpg') }}" class="img-fluid" alt="Popup Image">
         {%else%}
-        <img src="data:image/png;base64,{{ team.team_picture|b64encode }}" class="popup-btn" alt="Popup Image">
+        <img src="{{ url_for('serve_image', filepath=team.team_picture) }}" class="img-fluid" alt="Popup Image">
         {%endif%}
-        <i class="fas fa-bars menu-symbol"></i>
     </div>
-    <div class="popup" id="popup">
-        <ul>
-            <li><a href="{{url_for('team_home',team_id=team.id)}}">Team home</a></li>
-            <li><a href="{{url_for('team_profile',team_id=team.id)}}">Team profile</a></li>
-            <li><a href="{{url_for('manage_team',team_id=team.id)}}">Manage team</a></li>
-            <li><a href="{{url_for('manage_trips',team_id=team.id)}}">Manage trips</a></li>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Menu
+        </button>
+        <ul class="dropdown-menu centered" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{{url_for('team_home',team_id=team.id)}}">Home</a></li>
+            <li><a class="dropdown-item" href="{{url_for('team_profile',team_id=team.id)}}">Profilo</a></li>
+            {%if role=="team_leader"%}
+            <li><a class="dropdown-item" href="{{url_for('manage_team',team_id=team.id)}}">Gestisci squadra</a></li>
+            <li><a class="dropdown-item" href="{{url_for('manage_trips',team_id=team.id)}}">Gestisci giri</a></li>
+            {%endif%}
         </ul>
     </div>
     <script>
-        var popup = document.querySelector(".popup");
-        var popupBtn = document.querySelector(".popup-btn");
-        popupBtn.addEventListener("click", function () {
-            if (popup.style.display === "block") {
-                popup.style.display = "none";
-            } else {
-                popup.style.display = "block";
-            }
+        var dropdownButton = document.querySelector("#dropdownMenuButton");
+        var dropdownMenu = document.querySelector(".dropdown-menu");
+
+        dropdownButton.addEventListener("click", function () {
+            var isExpanded = dropdownButton.getAttribute("aria-expanded") === "true";
+            dropdownButton.setAttribute("aria-expanded", !isExpanded);
+            dropdownMenu.classList.toggle("show", !isExpanded);
+        });
+    </script>
+
+
+    <script>
+        var squadreMenuItem = document.querySelector("#squadreMenu");
+        var squadreSubMenu = document.querySelector("#squadreMenu + .dropdown-menu");
+
+        squadreMenuItem.addEventListener("click", function (event) {
+            event.preventDefault();
+            squadreSubMenu.classList.toggle("show");
         });
     </script>
 </div>
-<div class="main">
+{%endblock%}
 
-    <center>
-        <div class="box">
-            <table>
-                <caption>
-                    <h1 style="color:red">Users list</h1>
-                </caption>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Role</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for team_member in team_members %}
-                    <tr>
-                        <td><a
-                                href="{{url_for('member_view',user_id = team_member['user'].id, team_id= team_member['team_id'])}}">{{
-                                team_member['user'].username }}</a></td>
-                        <td style="text-align: center;">
-                            <form method="POST"
-                                action="{{ url_for('change_role',team_id=team.id,user_id=team_member['user'].id) }}">
-                                <input type="hidden" name="user_id" value="{{team_member['user'].id }}">
-                                <select name="role" onchange="this.form.submit()">
-                                    {% if team_member['role'] =='user'%}
-                                    <option value="user" selected>User</option>
-                                    <option value="team_leader">Team Leader</option>
-                                    {%elif team_member['role'] == 'team_leader'%}
-                                    <option value="team_leader" selected>Team Leader</option>
-                                    <option value="user">User</option>
-                                    {% endif %}
-                                </select>
-                            </form>
-                        </td>
-                        <td>
-                            <form method="POST"
-                                action="{{ url_for('unenroll_from_team', team_id=team.id, user_id=team_member['user'].id) }}">
-                                <input type="hidden" name="user_id" value="{{ team_member['user'].id }}">
-                                <div class="unenroll-button-container">
-                                    <input type="submit" class="unenroll-button" value="Unenroll">
-                                </div>
+{%block columnCenter%}
 
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+{%if team.team_background%}
+<style>
+    .center-column-box {
+        background-image: url("{{ url_for('serve_image', filepath=team.team_background) }}");
 
+    }
+</style>
+{%else%}
+<style>
+    .center-column-box {
+        background-image: url('../images/defaults/wallpaper_team_home.jpg');
 
-    </center>
+    }
+</style>
+{%endif%}
+<div class="table-box" style="display: inline-block; width:70%;margin-left: 15%;">
+    <table class="table table-striped">
+        <tr>
+            <h1 style="color:red">Lista dei membri</h1>
+        </tr>
+        <thead>
+            <tr>
+                <th>Membro</th>
+                <th>Ruolo</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team_member in team_members %}
+            <tr>
+                <td><a
+                        href="{{url_for('member_home',user_id = team_member['user'].id, team_id= team_member['team_id'])}}">{{
+                        team_member['user'].username }}
+                        {%if team_member['user'].username == current_user.username%} (tu){%endif%}</a>
+                </td>
+                <td style="text-align: center;">
+                    <form method="POST"
+                        action="{{ url_for('change_role',team_id=team.id,user_id=team_member['user'].id) }}">
+                        <input type="hidden" name="user_id" value="{{team_member['user'].id }}">
+                        <select name="role" onchange="this.form.submit()">
+                            {% if team_member['role'] =='user'%}
+                            <option value="user" selected>Membro</option>
+                            <option value="team_leader">Leader</option>
+                            {%elif team_member['role'] == 'team_leader'%}
+                            <option value="team_leader" selected>Leader</option>
+                            <option value="user">Membro</option>
+                            {% endif %}
+                        </select>
+                    </form>
+                </td>
+                <td>
+                    {%set member_to_deregister = team_member['user'].username %}
+                    <form method="POST"
+                        action="{{ url_for('unenroll_from_team', team_id=team.id, user_id=team_member['user'].id) }}"
+                        onsubmit="return confirmFormSubmission('{{member_to_deregister}}')">
+                        <input type="hidden" name="user_id" value="{{ team_member['user'].id }}">
+                        <input type="submit" value="Deregistra">
+                        <script>
+                            function confirmFormSubmission(userName) {
 
-    <center>
-        {% if requests_to_join %}
-        <div class="box">
-            <table>
-                <caption>
-                    <h1 style="color:red">Requests to join the team: </h1>
-                </caption>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for request in requests_to_join %}
-                    <tr>
-                        <td>
-                            <a href="{{ url_for('non_member_view', user_id=request['user'].id) }}">{{
-                                request['user'].username }}</a>
-                        </td>
-                        <td style="display: flex; justify-content: center; align-items: center;">
-                            <div style="display: inline;">
-                                <form
-                                    action="{{ url_for('decide_on_enrollment', request_id=request['id'], accept='Yes') }}"
-                                    method="POST">
-                                    <button class="enroll-button" type="submit">Approve</button>
-                                </form>
-                            </div>
-                            <div style="display: inline; margin-left: 10px;">
-                                <form
-                                    action="{{ url_for('decide_on_enrollment', request_id=request['id'], accept='No') }}"
-                                    method="POST">
-                                    <button class="unenroll-button" type="submit">Decline</button>
-                                </form>
-                            </div>
-                        </td>
-
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <h1 style="color:red">No new requests to join the team!</h1>
-        {%endif%}
-
-    </center>
+                                return confirm("Sei sicuro di voler deregistrare l'utente " + userName + " dal team?");
+                            }
+                        </script>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
-<div class="right-sidebar">
+
+{% if requests_to_join %}
+<div class="table-box" style="display: inline-block; width:70%;margin-left: 15%;">
+    <table class="table table-striped">
+        <tr>
+            <h1 style="color:red">Richieste di registrazione alla squadra: </h1>
+        </tr>
+        <thead>
+            <tr>
+                <th>Utente</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests_to_join %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('non_member_home', user_id=request['user'].id) }}">{{
+                        request['user'].username }}</a>
+                </td>
+                <td style="display: flex; justify-content: center; align-items: center;">
+                    <div style="display: inline;">
+                        <form action="{{ url_for('decide_on_enrollment', request_id=request['id'], accept='Yes') }}"
+                            method="POST">
+                            <button class="enroll-button" type="submit">Approva</button>
+                        </form>
+                    </div>
+                    <div style="display: inline; margin-left: 10px;">
+                        <form action="{{ url_for('decide_on_enrollment', request_id=request['id'], accept='No') }}"
+                            method="POST">
+                            <button class="unenroll-button" type="submit">Rifiuta</button>
+                        </form>
+                    </div>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="table-box" style="display: inline-block; width:60%;margin-left: 20%;">
+    <h3 style="color:red">Non ci sono richieste di registrazione alla squadra!</h3>
 
 </div>
-{% endblock %}
+{%endif%}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="flash-messages">
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endwith %}
+{%endblock%}
+
+{%block columnRight%}
+{%if team.team_banner%}
+<style>
+    .right-column {
+        background-image: url("{{ url_for('serve_image', filepath=team.team_banner) }}");
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+    }
+</style>
+{%endif%}
+
+{%if team.team_motto%}
+<div class="p-2 mx-auto my-auto">
+
+    <img src="{{ url_for('serve_image', filepath=team.team_motto) }}" alt="motto" class="img-fluid ">
+</div>
+{%endif%}
+{%endblock%}

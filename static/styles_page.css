@@ -1,40 +1,60 @@
+.menu-symbol {
+    position: relative;
+    color: rgb(15, 15, 15);
+    font-size: 20px;
+    left: 5%;
+    bottom: 0%;
+    cursor: pointer;
+}
+
+
+.menu-text {
+    position: relative;
+    margin-bottom: 0px;
+    color: rgb(15, 15, 15);
+    font-size: 20px;
+    left: 20%;
+    bottom: 0%;
+}
+
 .popup-btn-container {
     position: absolute;
-    top: calc(50% + 10px);
-    left: 40%;
+    top: 0;
+    left: 0;
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
 }
 
-.menu-symbol {
-    position: absolute;
-    color: rgb(15, 15, 15);
-    font-size: 20px;
-    right: -45px;
-    bottom: -50px;
-}
-
 .popup {
     position: absolute;
     display: none;
-    top: calc(70% + 10px);
-    left: 40%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-    border: 1px solid #ccc;
+    top: calc(100% + 10px);
+    /* Position the popup below the menu container by default */
+    margin-left: 0px;
+    padding: 10px;
+    /* Add padding for content */
+}
+
+@media (max-width: 800px) {
+    .popup {
+        top: 50%;
+        left: 50%;
+        transform: translateY(-50%);
+
+    }
 }
 
 .popup-btn {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 200px;
+    height: 200px;
     top: 30%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #fff;
     border: 1px solid #ccc;
-    cursor: pointer;
+    border-radius: 50%;
 }
 
 .popup-btn img {
@@ -77,6 +97,7 @@
 .popup li.subitem {
     padding: 5px 10px;
     cursor: pointer;
+    color: white;
 }
 
 .popup li.subitem:hover {
@@ -101,20 +122,41 @@
 /* Set up the right sidebar */
 .right-sidebar {
     width: 20%;
-    height: calc(100% - 100px);
+    height: calc(100% - 99px);
     top: 50px;
     bottom: 0px;
     right: 0px;
     overflow-y: auto;
     position: fixed;
-    background-color: #CCCCCC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 6px solid black;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
 }
+
+
+.centered-image-container {
+    text-align: center;
+}
+
+.centered-image {
+    background-color: transparent;
+    width: 400px;
+    /* desired width */
+    height: 400px;
+    /* desired height */
+}
+
 
 /* Set up the main content area */
 .main {
     width: 60%;
-    height: calc(100% - 100px);
-    background-color: #E8DCD9;
+    height: calc(100% - 99px);
+    background-size: 100% 100%;
+    background-position: center;
     left: 20%;
     right: 20%;
     top: 0px;
@@ -125,14 +167,23 @@
     align-items: center;
     align-content: center;
     overflow-y: auto;
+    overflow-x: auto;
     justify-content: center;
+    border-left: 6px solid black;
+
+
+}
+
+.main.override-background {
+    background-image: none !important;
 }
 
 .box {
     max-width: 90%;
-    max-height: 90%;
+    width: fit-content;
+    height: fit-content;
     background-color: orange;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     padding: 20px;
@@ -142,6 +193,9 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    opacity: 0.75;
+    border-radius: 10px;
+
 }
 
 .footer-button {
@@ -159,6 +213,14 @@
     /* Added table-layout property */
 }
 
+.green-bg {
+    background-color: rgb(126, 215, 126);
+}
+
+.yellow-bg {
+    background-color: rgb(250, 250, 80);
+}
+
 .box td,
 .box th {
     padding: 5px;
@@ -170,6 +232,7 @@
     /* Hide overflowing content */
     text-overflow: ellipsis;
     /* Add ellipsis (...) to indicate truncated text */
+
 }
 
 
@@ -180,56 +243,88 @@
 .prestige-label-container {
     display: flex;
     flex-wrap: wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow: auto;
+
 }
 
 .prestige-label {
     max-width: 100%;
+
 }
 
 /* Set up the left sidebar */
 .left-sidebar {
     width: 20%;
-    height: calc(100% - 100px);
+    height: calc(100% - 99px);
     top: 50px;
     bottom: 0px;
     left: 0px;
     overflow-y: auto;
     position: fixed;
-    background-color: #CCCCCC;
+    border-right: 6px solid black;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
 }
 
+
 .logout-button {
-    position: absolute;
-    top: 10px;
-    right: 20px;
     background-color: grey;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    height: 60%;
+    margin-right: 10px;
+    margin-left: 10px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 3px;
+    width: fit-content;
+
 }
+
 
 
 .home-button {
-    position: absolute;
-    top: 10px;
-    left: 20px;
     background-color: grey;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    height: 60%;
+    margin-right: 10px;
+    margin-left: 10px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 5px;
+    width: 80px;
 }
 
+.logout-button {
+    float: right;
+}
 
+.round-container {
+    display: inline-block;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 50%;
+}
+
+.menu-container {
+    display: flex;
+    align-items: center;
+}
+
+.menu-container i,
+.menu-container span {
+    margin-right: 10px;
+}
 
 /* Set up the header */
 .header {
@@ -241,6 +336,8 @@
     text-align: center;
     line-height: 50px;
     z-index: 999;
+    display: flex;
+    align-items: center;
 }
 
 /* Set up the footer */
@@ -274,7 +371,7 @@ a {
 body {
     display: block;
     margin: 0px;
-    height: calc(100% - 100px);
+    height: 100%;
 
     color: #000;
     font-family: MaisonNeue, Segoe UI, Helvetica Neue, -apple-system, system-ui, BlinkMacSystemFont, Roboto, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
@@ -283,20 +380,21 @@ body {
 }
 
 .content-container {
-    min-height: calc(100vh - 100px);
-    /* subtract the header and footer height from the viewport height */
+    height: calc(100% - 100px);
     padding-top: 50px;
-    background-color: #E8DCD9;
-    /* set the padding-top to the height of the header */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .login-table {
-    background-color: #eb8500;
+    background-color: orange;
     border: 1px solid #ccc;
     border-radius: 10px;
     padding: 20px;
-    width: 400px;
+    width: fit-content;
     margin: 30 auto;
+    opacity: 0.75;
 }
 
 .login-table table {
@@ -322,6 +420,55 @@ body {
     padding: 0;
 }
 
+.main {
+    position: relative;
+    padding-bottom: 60px;
+    /* Add space for flash messages */
+}
+
+.box {
+    margin-bottom: 20px;
+    /* Add margin between boxes */
+}
+
+.flash-messages {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    width: 40%;
+    padding: 10px;
+    background-color: orange;
+    color: white;
+    text-align: center;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 1;
+    margin: 0 auto;
+    /* Center horizontally */
+    animation: fadeOut 2s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+.flash-messages.show {
+    opacity: 1;
+}
+
+
+
+
 .stats-table {
     position: absolute;
     top: calc(43% + 5px);
@@ -345,4 +492,64 @@ body {
 
 .stats-table td {
     text-align: center;
+}
+
+.teams-container {
+    display: flex;
+}
+
+.teams-container .home-button {
+    margin-right: 10px;
+}
+
+.home-button-menu {
+    background-color: grey;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-left: 10px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px;
+    position: relative;
+}
+
+.home-button-menu:hover .sublist-home {
+    display: block;
+}
+
+.sublist-home {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: black;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.sublist-home ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 2px;
+}
+
+.sublist-home ul li {
+    margin-bottom: 0px;
+    font-size: 14px;
+    line-height: 2;
+}
+
+.sublist-home ul li:hover {
+    background-color: grey;
+}
+
+.sublist-home ul li:not(:last-child) {
+    margin-bottom: 10px;
+    /* Adjust the margin between li elements */
 }

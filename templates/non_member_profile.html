@@ -1,0 +1,123 @@
+{% extends "base_bootstrap.html" %}
+
+{%block columnCenter%}
+
+{%if user.profile_background%}
+<style>
+    .center-column-box {
+        background-image: url("{{ url_for('serve_image', filepath=user.profile_background) }}");
+
+    }
+</style>
+{%endif%}
+<div class="table-box">
+    <table class="table table-striped">
+
+        <h1 style="color:red">Profilo utente</h1>
+
+        <tr>
+            <td>Username</td>
+            <td>{{user.username}}</td>
+        </tr>
+        <tr>
+            <td>Nome</td>
+            <td>{{user.name}}</td>
+        </tr>
+        <tr>
+            <td>Cognome</td>
+
+            <td>{{user.surname}}</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>{{user.email}}</td>
+        </tr>
+        <tr>
+            <td>Account di strava</td>
+            <td>{{ user.strava_account }}</td>
+        </tr>
+        <tr>
+            <td>Numero di telefono</td>
+
+            <td>{{ user.phone_number }}</td>
+        </tr>
+
+    </table>
+</div>
+{%endblock%}
+
+
+{%block columnLeft%}
+
+{%if user.profile_banner%}
+<style>
+    .left-column {
+        background-image: url("{{ url_for('serve_image', filepath=user.profile_banner) }}");
+
+    }
+</style>
+{%endif%}
+
+
+<div class="p-2 mx-auto my-auto" style="text-align: center;">
+
+    <div class="round-container">
+
+        {%if not current_user.profile_picture%}
+        <img src="{{ url_for('serve_image', filepath='defaults/app_icon.jpg') }}" class="img-fluid" alt="Popup Image">
+        {%else%}
+        <img src="{{ url_for('serve_image', filepath=current_user.profile_picture) }}" class="img-fluid"
+            alt="Popup Image">
+        {%endif%}
+    </div>
+
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false">
+            Menu
+        </button>
+        <ul class="dropdown-menu centered" aria-labelledby="dropdownMenuButton">
+            <li><a class="dropdown-item" href="{{url_for('non_member_home',user_id=user.id)}}">Home</a></li>
+            <li><a class="dropdown-item" href="{{url_for('non_member_profile',user_id=user.id)}}">Profilo</a></li>
+        </ul>
+    </div>
+
+</div>
+
+<script>
+    var dropdownButton = document.querySelector("#dropdownMenuButton");
+    var dropdownMenu = document.querySelector(".dropdown-menu");
+
+    dropdownButton.addEventListener("click", function () {
+        var isExpanded = dropdownButton.getAttribute("aria-expanded") === "true";
+        dropdownButton.setAttribute("aria-expanded", !isExpanded);
+        dropdownMenu.classList.toggle("show", !isExpanded);
+    });
+</script>
+
+
+<script>
+    var squadreMenuItem = document.querySelector("#squadreMenu");
+    var squadreSubMenu = document.querySelector("#squadreMenu + .dropdown-menu");
+
+    squadreMenuItem.addEventListener("click", function (event) {
+        event.preventDefault();
+        squadreSubMenu.classList.toggle("show");
+    });
+</script>
+
+
+{%endblock%}
+
+
+{%block columnRight%}
+
+{%if user.profile_banner%}
+<style>
+    .left-column {
+        background-image: url("{{ url_for('serve_image', filepath=user.profile_banner) }}");
+
+    }
+</style>
+{%endif%}
+{%endblock%}

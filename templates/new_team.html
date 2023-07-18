@@ -1,26 +1,38 @@
-{% extends "base.html" %}
-
-{% block content %}<center>
-    <h1 style="color:red">Register a new team</h1>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.name.label }}<br>
-            {{ form.name(size=32) }}<br>
-            {% for error in form.name.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
+{% extends "base_bootstrap.html" %}
 
 
 
-        <br>
+{%block columnCenter%}
+<div class="table-box" style="width:50%; left:25%">
+    <table class="table table-striped">
+        <tbody>
+            <tr>
+                <h1 style="color:red">Registra una nuova squadra</h1>
+            </tr>
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                <tr>
+                    <td>{{ form.name.label }}</td>
+                    <td>{{ form.name(size=32) }}</td>
+                </tr>
 
-        <p>{{ form.description.label }}<br>
-            {{form.description(size=20, rows=5)}}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
-</center>
+                <tr>
+                    <td>{{ form.description.label }}</td>
+                    <td>{{ form.description(size=20, rows=5) }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center;">{{ form.submit() }}</td>
+                </tr>
+            </form>
+
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}
+
+{%block columnLeft%}
+{%endblock%}
+
+{%block columnRight%}
+{%endblock%}
