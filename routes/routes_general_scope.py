@@ -141,7 +141,6 @@ def edit_trip(trip_id,user_id):
         trip.elevation = float(request.form["elevation"])
         trip.prestige = int(request.form["prestige"])
         trip.description = request.form["description"]
-        #trip.user_id = user_id
         trip.n_of_partecipants = int(request.form["n_of_partecipants"])
         placement_values = [int(pl) for pl in request.form.getlist('placement[]')]
         edit_placements = [int(pl) for pl in request.form.getlist('edit_placement')]
@@ -175,7 +174,7 @@ def edit_trip(trip_id,user_id):
         trip_team = trip.get_team()
         _ = trip_team.ranking_builder()
 
-        if user != current_user:
+        if my_role_in_team == "team_leader":
             return redirect(url_for('manage_trips',team_id=trip.team_id))
         else:
             return redirect(url_for('trips_overview',user_id=user.id))
