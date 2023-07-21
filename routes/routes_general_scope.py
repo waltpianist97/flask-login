@@ -122,7 +122,7 @@ def edit_trip(trip_id,user_id):
     trip = Trip.query.get(trip_id)
     placements = trip.get_placements()
     user = User.query.get(user_id)
-    my_role_in_team = user.get_role_in_team(trip.team_id)
+    user_role_in_team = user.get_role_in_team(trip.team_id)
     form = NewTripForm(obj=trip)
     trip_team = Team.query.get(trip.team_id)
     form.team.choices = [(trip_team.id,trip_team.name)]
@@ -151,7 +151,7 @@ def edit_trip(trip_id,user_id):
             trip.recorded_on =  datetime.strptime(request.form["recorded_on"],DATE_FORMAT)
         except ValueError:
             # Invalid date format
-            return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=my_role_in_team,is_approved=trip.is_approved,placements=placements)
+            return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=user_role_in_team,is_approved=trip.is_approved,placements=placements)
 
         if edit_placements:
             for id, place in zip(placement_ids, edit_placements):
@@ -174,14 +174,15 @@ def edit_trip(trip_id,user_id):
         trip_team = trip.get_team()
         _ = trip_team.ranking_builder()
 
+        my_role_in_team = current_user.get_role_in_team(trip.team_id)
         if my_role_in_team == "team_leader":
             return redirect(url_for('manage_trips',team_id=trip.team_id))
         else:
-            return redirect(url_for('trips_overview',user_id=user.id))
+            return redirect(url_for('trips_overview',user_id=current_user.id))
 
  
 
-    return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=my_role_in_team,is_approved=trip.is_approved,placements=placements,teams=teams)
+    return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=user_role_in_team,is_approved=trip.is_approved,placements=placements,teams=teams)
 
 @app.route("/delete_trip/<int:trip_id>/<int:user_id>")
 @login_required
