@@ -6,9 +6,12 @@ from models import User, Trip, Team, TeamUserAssociation, RequestsToJoinTeam
 from forms import *
 from werkzeug.urls import url_parse
 from datetime import datetime
-from tools import send_email_utility,AUTO_MAIL, PictureUploader
+from tools import send_email_utility,AUTO_MAIL, PictureUploader, get_strava_client
 import os
 from pathlib import Path
+import os
+import warnings
+
 
 @app.route('/user_home/<username>',methods=['GET', 'POST'])
 @login_required
@@ -178,3 +181,24 @@ def withdraw_request_enrollment(request_id,team_id):
 
     return redirect(url_for("team_home",team_id=team_id))
 
+
+@app.route('/strava_synch',methods=["GET","POST"])
+@login_required
+def strava_synch():
+   
+    strava_client = get_strava_client()
+    if strava_client:
+        flash("Profilo sincronizzato con Strava")
+    else:
+        flash("Profilo non sincronizzato con Strava")
+    return redirect(url_for("user_profile"))
+
+@app.route('/trips_from_strava',methods=["GET","POST"])
+@login_required
+def trips_from_strava():
+    strava_client = get_strava_client()
+    athlete = strava_client.get_logged_in_athlete()
+    last_trip_date = datetime(2023, 3, 1, 0, 0, 0)
+    activities = strava_client.get_logged_in_athlete_activities(after=last_trip_date)
+
+    return render_template('trips_from_strava.html', activities=activities)
