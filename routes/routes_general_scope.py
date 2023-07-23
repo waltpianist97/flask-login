@@ -9,6 +9,9 @@ import secrets
 from datetime import datetime, timedelta
 import smtplib
 from tools import AUTO_MAIL, send_email_utility
+import os 
+from urllib.parse import unquote
+
 DATE_FORMAT = "%d/%m/%Y"
 
 #%% GENERAL   
@@ -94,19 +97,24 @@ def new_trip(user_id,team_id=None):
             send_email_utility('Richiesta approvazione giro',f"{user.username} ha richiesto di registrare il giro: {trip.tripname} per il team {trip.get_team().name}, controlla la tua pagina 'Gestisci giri'!",AUTO_MAIL,emails_leaders)
         else:
             other_members_emails = [user.email for user in team.users if trip.get_user()!=user]
-            send_email_utility("Registrazione nuovo giro",f"Il giro: {trip.tripname} di {trip.get_user().username} e' stato registrato per il team {trip.get_team().name}",AUTO_MAIL,other_members_emails)
+            if other_members_emails:
+                send_email_utility("Registrazione nuovo giro",f"Il giro: {trip.tripname} di {trip.get_user().username} e' stato registrato per il team {trip.get_team().name}",AUTO_MAIL,other_members_emails)
+            _ = team.ranking_builder()
 
 
         if user == current_user:
             return redirect(url_for('trips_overview',user_id=user.id))
         else:
-            return redirect(url_for('member_view',team_id=form.team.data,user_id=user.id))
+            return redirect(url_for('member_home',team_id=form.team.data,user_id=user.id))
         
     return render_template('new_trip.html',title="Add new trip", form = form, teams= teams)
 
-@app.route('/images/<filename>')
-def serve_image(filename):
-    return send_from_directory('images', filename)
+@app.route('/images/<path:filepath>',methods=['GET', 'POST'])
+def serve_image(filepath):
+    directory = 'images'
+    full_path = os.path.join(directory, filepath)
+
+    return send_from_directory(os.path.dirname(full_path), os.path.basename(full_path))
 
 @app.route("/edit_trip/<int:trip_id>/<int:user_id>", methods=['GET', 'POST'])
 @login_required
@@ -114,7 +122,7 @@ def edit_trip(trip_id,user_id):
     trip = Trip.query.get(trip_id)
     placements = trip.get_placements()
     user = User.query.get(user_id)
-    my_role_in_team = user.get_role_in_team(trip.team_id)
+    user_role_in_team = user.get_role_in_team(trip.team_id)
     form = NewTripForm(obj=trip)
     trip_team = Team.query.get(trip.team_id)
     form.team.choices = [(trip_team.id,trip_team.name)]
@@ -133,7 +141,6 @@ def edit_trip(trip_id,user_id):
         trip.elevation = float(request.form["elevation"])
         trip.prestige = int(request.form["prestige"])
         trip.description = request.form["description"]
-        trip.user_id = user_id
         trip.n_of_partecipants = int(request.form["n_of_partecipants"])
         placement_values = [int(pl) for pl in request.form.getlist('placement[]')]
         edit_placements = [int(pl) for pl in request.form.getlist('edit_placement')]
@@ -144,7 +151,7 @@ def edit_trip(trip_id,user_id):
             trip.recorded_on =  datetime.strptime(request.form["recorded_on"],DATE_FORMAT)
         except ValueError:
             # Invalid date format
-            return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=my_role_in_team,is_approved=trip.is_approved,placements=placements)
+            return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=user_role_in_team,is_approved=trip.is_approved,placements=placements)
 
         if edit_placements:
             for id, place in zip(placement_ids, edit_placements):
@@ -163,15 +170,19 @@ def edit_trip(trip_id,user_id):
 
         if trip.get_user() != current_user and current_user in trip.get_team().get_leaders():
             send_email_utility('Modifica giro', f"Il tuo giro e' stato modificato dal team leader {current_user.username}",AUTO_MAIL,trip.get_user().email)
-       
-        if user != current_user:
+      
+        trip_team = trip.get_team()
+        _ = trip_team.ranking_builder()
+
+        my_role_in_team = current_user.get_role_in_team(trip.team_id)
+        if my_role_in_team == "team_leader":
             return redirect(url_for('manage_trips',team_id=trip.team_id))
         else:
-            return redirect(url_for('trips_overview',user_id=user.id))
+            return redirect(url_for('trips_overview',user_id=current_user.id))
 
  
 
-    return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=my_role_in_team,is_approved=trip.is_approved,placements=placements,teams=teams)
+    return render_template('edit_trip.html', form=form,trip_id=trip.id,user_id=user_id,my_role_in_team=user_role_in_team,is_approved=trip.is_approved,placements=placements,teams=teams)
 
 @app.route("/delete_trip/<int:trip_id>/<int:user_id>")
 @login_required
@@ -293,8 +304,12 @@ def register():
 
         user = User(username=form.username.data, email=form.email.data)
         user.set_password(form.password.data)
+        user.create_pictures_folder()
+
         db.session.add(user)
         db.session.commit()
+        
+
         flash('Congratulazioni, ti sei registrato sulla piattaforma!')
         return redirect(url_for('login'))
    

@@ -4,6 +4,9 @@ from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import db
+import os
+import shutil
+from tools import send_email_utility, AUTO_MAIL
 
 class TeamUserAssociation(db.Model):
     __tablename__ = 'team_user_association'
@@ -13,6 +16,7 @@ class TeamUserAssociation(db.Model):
     team_id = Column(Integer, ForeignKey('team.id', ondelete='CASCADE'))
     role =Column(String(140))
     join_date = Column(DateTime)
+    current_ranking = Column(Integer)
 
 
 class AdminMixin:
@@ -33,10 +37,10 @@ class User(db.Model,UserMixin,AdminMixin):
     trips = relationship('Trip',backref='user',lazy='dynamic',cascade="all, delete-orphan")
     teams = relationship('Team', secondary="team_user_association", back_populates='users')
     join_requests = relationship("RequestsToJoinTeam", back_populates="user", cascade="all, delete-orphan")
-    profile_picture = Column(BLOB)
-    profile_background = Column(BLOB)
-    profile_banner = Column(BLOB)
-    
+    profile_picture = Column(String(140))
+    profile_background = Column(String(140))
+    profile_banner = Column(String(140))
+
     _is_admin = Column(Boolean,nullable=True)
 
     def set_password(self,password):
@@ -65,6 +69,18 @@ class User(db.Model,UserMixin,AdminMixin):
             result.append({"team_name": team.name,"team_id":team.id, "trips_by_team": trips_in_team})
         return result
 
+    def create_pictures_folder(self):
+        current_file_path = os.path.realpath(__file__)
+        parent_folder = os.path.dirname(os.path.dirname(current_file_path))
+        pics_folder_path = f"{parent_folder}/images/users/{self.username}"
+        os.mkdir(pics_folder_path)
+    
+    def delete_pictures_folder(self):
+        current_file_path = os.path.realpath(__file__)
+        parent_folder = os.path.dirname(os.path.dirname(current_file_path))
+        pics_folder_path = f"{parent_folder}/images/users/{self.username}"
+        if os.path.exists(pics_folder_path):
+            shutil.rmtree(pics_folder_path)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -127,23 +143,60 @@ class Team(db.Model):
     users = relationship('User', secondary="team_user_association", back_populates='teams')
     join_requests = relationship("RequestsToJoinTeam", back_populates="team", cascade="all, delete-orphan")
     description = Column(String(140))
-    team_picture = Column(BLOB)
-    team_background = Column(BLOB)
-    team_banner = Column(BLOB)
-    team_motto = Column(BLOB)
+    team_picture = Column(String(140))
+    team_background = Column(String(140))
+    team_banner = Column(String(140))
+    team_motto = Column(String(140))
 
     def __repr__(self):
         return '<Team {}>'.format(self.description)
 
     def add_member(self, member:User,role:str,join_date:datetime = None):
-        t_u_association = TeamUserAssociation(team_id=self.id,user_id=member.id,role=role,join_date=join_date)
+        t_u_association = TeamUserAssociation(team_id=self.id,user_id=member.id,role=role,join_date=join_date,current_ranking=len(self.users)+1)
         db.session.add(t_u_association)
         db.session.commit()
+
+    def set_member_ranking(self,member:User,current_ranking:int):
+        t_u_association = TeamUserAssociation.query.filter_by(user_id=member.id,team_id=self.id).first()
+        previous_ranking = t_u_association.current_ranking
+        if previous_ranking != current_ranking:
+            send_email_utility('Cambio ranking',f"Il tuo ranking è cambiato nel team {self.name}! Sei passato dal {previous_ranking}° al {current_ranking}° posto!",AUTO_MAIL,member.email)
+
+        t_u_association.current_ranking = current_ranking
+        db.session.commit()
+
+    def ranking_builder(self):
+        members_by_team = User.query.filter(User.id.in_([member.id for member in self.users])).all()
+        ranking_list = []
+        for user_by_team in members_by_team:
+            all_scores_by_user = Trip.query.filter_by(user_id=user_by_team.id,team_id=self.id,is_approved=True).all()
+            tot_score_by_user =sum([score_by_user.score for score_by_user in all_scores_by_user])
+            ranking_list.append({"user_id":user_by_team.id,"user":user_by_team.username,"total score":tot_score_by_user,"user_obj":user_by_team})
+        ranking_list = list(enumerate(sorted(ranking_list, key=lambda x: x['total score'],reverse=True)))
+
+        for place,ranking  in ranking_list:
+            self.set_member_ranking(ranking["user_obj"],place+1)
+
+
+        return ranking_list
 
     def get_leaders(self):
         leaders = User.query.join(TeamUserAssociation).filter(TeamUserAssociation.team_id == self.id, TeamUserAssociation.role == "team_leader").all()
         return leaders
     
+    def create_pictures_folder(self):
+        current_file_path = os.path.realpath(__file__)
+        parent_folder = os.path.dirname(os.path.dirname(current_file_path))
+        pics_folder_path = f"{parent_folder}/images/teams/{self.name}"
+        os.mkdir(pics_folder_path)
+        
+    def delete_pictures_folder(self):
+        current_file_path = os.path.realpath(__file__)
+        parent_folder = os.path.dirname(os.path.dirname(current_file_path))
+        pics_folder_path = f"{parent_folder}/images/teams/{self.name}"
+        if os.path.exists(pics_folder_path):
+            shutil.rmtree(pics_folder_path)
+
 class RequestsToJoinTeam(db.Model):
     __tablename__ = 'requests_to_join_team'
 
