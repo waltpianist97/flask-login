@@ -35,10 +35,18 @@ def index():
 
 @app.route('/new_trip/<int:user_id>', methods=['GET', 'POST'])
 @app.route('/new_trip/<int:user_id>/<int:team_id>', methods=['GET', 'POST'])
+@app.route('/new_trip/<int:user_id>/<act_name>/<float:act_speed>/<float:act_distance>/<float:act_elevation>', methods=['GET', 'POST'])
 @login_required
-def new_trip(user_id,team_id=None):
+def new_trip(user_id,team_id=None,act_name=None,act_speed=None,act_distance=None,act_elevation=None):
     form = NewTripForm()
     user = User.query.get(user_id)
+
+    #handle strava api connection
+    if act_name is not None and act_speed is not None and act_distance is not None and act_elevation is not None:
+        form.tripname.data = act_name
+        form.speed.data = round(act_speed,2)
+        form.distance.data = act_distance
+        form.elevation.data = act_elevation
 
     if not team_id:
         if user == current_user:

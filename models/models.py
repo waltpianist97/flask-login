@@ -82,6 +82,9 @@ class User(db.Model,UserMixin,AdminMixin):
         if os.path.exists(pics_folder_path):
             shutil.rmtree(pics_folder_path)
 
+    def get_trips(self):
+        return self.trips
+    
     def __repr__(self):
         return '<User {}>'.format(self.username)
   

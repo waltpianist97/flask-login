@@ -1,12 +1,12 @@
-from app import app, db
-from flask import request, render_template, flash, redirect,url_for
+from app import app, db, strava_client
+from flask import request, render_template, flash, redirect,url_for,session
 from flask_login import current_user,login_required
 from sqlalchemy import or_, and_, desc, func
 from models import User, Trip, Team, TeamUserAssociation, RequestsToJoinTeam
 from forms import *
 from werkzeug.urls import url_parse
 from datetime import datetime
-from tools import send_email_utility,AUTO_MAIL, PictureUploader, get_strava_client
+from tools import send_email_utility,AUTO_MAIL, PictureUploader, get_or_create_strava_client
 import os
 from pathlib import Path
 import os
@@ -81,7 +81,10 @@ def user_profile():
     form = ProfileForm(obj=user)
     teams = Team.query.all()
     picture_uploader = PictureUploader("users",current_user.username)
-
+    global strava_client
+    is_strava_client_in_synch = False
+    if strava_client:
+        is_strava_client_in_synch = True
 
     if form.validate_on_submit():
         # Handle profile picture upload
@@ -110,11 +113,12 @@ def user_profile():
             filename = picture_uploader.load_file(file)
             user.profile_banner = f'users/{current_user.username}/{filename}'
 
+    
 
         db.session.commit()
         flash("Il tuo profilo e' stato aggiornato!", 'success')
         return redirect(url_for('user_profile'))
-    return render_template('user_profile.html', form=form,teams=teams)
+    return render_template('user_profile.html', form=form,teams=teams,is_strava_in_synch=is_strava_client_in_synch)
 
 
 @app.route('/trips_overview/<int:user_id>',methods=['GET', 'POST'])
@@ -185,8 +189,8 @@ def withdraw_request_enrollment(request_id,team_id):
 @app.route('/strava_synch',methods=["GET","POST"])
 @login_required
 def strava_synch():
-   
-    strava_client = get_strava_client()
+    global strava_client
+    strava_client = get_or_create_strava_client()
     if strava_client:
         flash("Profilo sincronizzato con Strava")
     else:
@@ -196,9 +200,11 @@ def strava_synch():
 @app.route('/trips_from_strava',methods=["GET","POST"])
 @login_required
 def trips_from_strava():
-    strava_client = get_strava_client()
-    athlete = strava_client.get_logged_in_athlete()
-    last_trip_date = datetime(2023, 3, 1, 0, 0, 0)
-    activities = strava_client.get_logged_in_athlete_activities(after=last_trip_date)
-
-    return render_template('trips_from_strava.html', activities=activities)
+    global strava_client
+    if strava_client:
+        last_trip_date = datetime(2023, 3, 1, 0, 0, 0)
+        activities = strava_client.get_logged_in_athlete_activities(after=last_trip_date)
+        return render_template('trips_from_strava.html', activities=activities)
+    else:
+        flash("Sincronizza il tuo account con strava prima di sincronizzare i giri!")
+        return redirect(url_for("user_profile"))

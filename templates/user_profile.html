@@ -124,10 +124,15 @@
             </tr>
             <tr>
                 <td>{{ form.strava_account.label }}</td>
-                <td>{{ form.strava_account() }} <button>
-                        <a style="color:black" href="{{url_for('strava_synch')}}">Sincronizza</a>
-
-                    </button></td>
+                <td>{{ form.strava_account() }}
+                    <button {% if is_strava_in_synch %}disabled{% endif %}>
+                        {% if not is_strava_in_synch %}
+                        <a style="color: black;" href="{{ url_for('strava_synch') }}">Sincronizza</a>
+                        {% else %}
+                        Sincronizzato con l'account di Strava
+                        {% endif %}
+                    </button>
+                </td>
 
             </tr>
             <tr>

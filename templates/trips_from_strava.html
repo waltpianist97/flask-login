@@ -27,27 +27,21 @@
             <th><strong>Velocità (km/h)</strong></th>
             <th><strong>Distanza (km)</strong></th>
             <th><strong>Dislivello (m)</strong></th>
-            <th><strong>Numero di partecipanti</strong></th>
             <th><strong>Data</strong></th>
-            <th><strong>Prestigio</strong></th>
-            <th><strong>Punteggio</strong></th>
             <th><strong>Azioni</strong></th>
         </thead>
 
         <tbody>
             {%for activity in activities%}
 
-            <td>{{ activity["name"]}}</td>
-            <td>{{ activity["average_speed"]*3.6 }}</td>
-            <td>{{ activity["distance"] }}</td>
-            <td>{{ activity["elev_high"] }}</td>
-
-            <td>n di partecipanti</td>
+            <td>{{ activity.name}}</td>
+            <td>{{ activity.average_speed*3.6 }}</td>
+            <td>{{ activity.distance/1000 }}</td>
+            <td>{{ activity._total_elevation_gain }}</td>
             <td>data del giro</td>
-            <td>prestigio</td>
-            <td>punteggio</strong></td>
-            <td>Operazioni
-            </td>
+            <td><a class="home-button"
+                    href="{{url_for('new_trip',user_id = current_user.id, act_name=activity.name,act_speed=activity.average_speed*3.6, act_distance = activity.distance/1000,act_elevation = activity._total_elevation_gain)}}">Aggiungi
+                    giro</a></td>
 
             </tr>
             {%endfor%}

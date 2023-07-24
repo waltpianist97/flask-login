@@ -18,3 +18,4 @@ app.secret_key = os.urandom(24)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 db = SQLAlchemy(app)
+strava_client = None
