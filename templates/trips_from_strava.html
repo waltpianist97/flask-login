@@ -40,7 +40,7 @@
             <td>{{ activity._total_elevation_gain }}</td>
             <td>data del giro</td>
             <td><a class="home-button"
-                    href="{{url_for('new_trip',user_id = current_user.id, act_name=activity.name,act_speed=activity.average_speed*3.6, act_distance = activity.distance/1000,act_elevation = activity._total_elevation_gain)}}">Aggiungi
+                    href="{{url_for('new_trip',user_id = current_user.id, act_name=activity.name,act_speed=activity.average_speed*3.6, act_distance = activity.distance/1000,act_elevation = activity._total_elevation_gain,act_id=activity.id)}}">Aggiungi
                     giro</a></td>
 
             </tr>
