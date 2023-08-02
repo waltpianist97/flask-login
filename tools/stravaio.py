@@ -370,7 +370,7 @@ def _request_strava_authorize(client_id, port):
 
 def run_server_and_wait_for_token(port, client_id, client_secret):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('127.0.0.1', port))
+        s.bind(('0.0.0.0', port))
         s.listen()
         conn, addr = s.accept()
 
