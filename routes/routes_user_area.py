@@ -86,6 +86,11 @@ def user_profile():
     is_strava_client_in_synch = False
     if strava_client:
         is_strava_client_in_synch = True
+        user_from_strava = strava_client.get_logged_in_athlete().api_response
+        if not user.name:
+            form.name.data = user_from_strava.firstname
+        if not user.surname:
+            form.surname.data = user_from_strava.lastname
 
     if form.validate_on_submit():
         # Handle profile picture upload
