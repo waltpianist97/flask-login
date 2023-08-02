@@ -36,18 +36,21 @@ def index():
 
 @app.route('/new_trip/<int:user_id>', methods=['GET', 'POST'])
 @app.route('/new_trip/<int:user_id>/<int:team_id>', methods=['GET', 'POST'])
-@app.route('/new_trip/<int:user_id>/<act_name>/<float:act_speed>/<float:act_distance>/<float:act_elevation>/<int:act_id>', methods=['GET', 'POST'])
+@app.route('/new_trip/<int:user_id>/<act_name>/<float:act_speed>/<float:act_distance>/<float:act_elevation>/<act_date>/<int:act_id>', methods=['GET', 'POST'])
 @login_required
-def new_trip(user_id, team_id=None, act_name=None, act_speed=None, act_distance=None, act_elevation=None, act_id=None):
+def new_trip(user_id, team_id=None, act_name=None, act_speed=None, act_distance=None, act_elevation=None, act_date=None, act_id=None):
     form = NewTripForm()
     user = User.query.get(user_id)
 
     # handle strava api connection
-    if act_name is not None and act_speed is not None and act_distance is not None and act_elevation is not None:
+    if act_name is not None and act_speed is not None and act_distance is not None and act_elevation is not None and act_date is not None:
         form.tripname.data = act_name
         form.speed.data = round(act_speed, 2)
         form.distance.data = act_distance
         form.elevation.data = act_elevation
+
+        act_date = act_date.replace('-', '/')
+        form.recorded_on.data = act_date
 
     if not team_id:
         if user == current_user:
