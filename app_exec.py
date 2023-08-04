@@ -1,5 +1,5 @@
 from app import app, login_manager
-from routes import routes_general_scope, routes_team_area, routes_user_area, routes_admin_area
+from routes import routes_general_scope, routes_team_area, routes_user_area, routes_admin_area, routes_strava_api
 from models import User
 
 
