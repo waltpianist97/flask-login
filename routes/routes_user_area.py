@@ -6,7 +6,8 @@ from models import User, Trip, Team, TeamUserAssociation, RequestsToJoinTeam
 from forms import *
 from werkzeug.urls import url_parse
 from datetime import datetime
-from tools import send_email_utility, AUTO_MAIL, PictureUploader, get_or_create_strava_client
+from tools import send_email_utility, AUTO_MAIL, PictureUploader, stravaio
+from stravaio import StravaIO
 import os
 from pathlib import Path
 import os
@@ -82,9 +83,11 @@ def user_profile():
     form = ProfileForm(obj=user)
     teams = Team.query.all()
     picture_uploader = PictureUploader("users", current_user.username)
-    global strava_client
     is_strava_client_in_synch = False
-    if strava_client:
+
+    strava_token = session.get('strava_token', None)
+    if strava_token:
+        strava_client = StravaIO(access_token=strava_token)
         is_strava_client_in_synch = True
         user_from_strava = strava_client.get_logged_in_athlete().api_response
         if not user.name:
@@ -197,19 +200,13 @@ def withdraw_request_enrollment(request_id, team_id):
 @app.route('/strava_synch', methods=["GET", "POST"])
 @login_required
 def strava_synch():
-    global strava_client
-    strava_client = get_or_create_strava_client()
-    if strava_client:
-        flash("Profilo sincronizzato con Strava")
-    else:
-        flash("Profilo non sincronizzato con Strava")
-    return redirect(url_for("user_profile"))
+    return redirect(url_for("authorize"))
 
 
 @app.route('/trips_from_strava', methods=["GET", "POST"])
 @login_required
 def trips_from_strava():
-    global strava_client
+    strava_client = StravaIO(access_token=session.get('strava_token', None))
     if strava_client:
         activities = strava_client.get_logged_in_athlete_activities()
         existing_strava_ids = [

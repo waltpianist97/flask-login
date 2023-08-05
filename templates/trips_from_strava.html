@@ -17,8 +17,14 @@
     <h1 style="color:red; text-align: center;">Nuovi giri per {{current_user.username}} dal profilo di Strava!</h1>
 
 </div>
+{%if not activities%}
+<div class="table-box" style="display: inline-block; width:60%;margin-left: 20%;">
+    <h3 style="color:red">Nessun giro da aggiungere dal profilo Strava!</h3>
 
+</div>
+{%else%}
 <div class="table-box">
+
     <table class="table table-striped">
 
 
@@ -32,6 +38,7 @@
         </thead>
 
         <tbody>
+
             {%for activity in activities%}
 
             <td>{{ activity.name}}</td>
@@ -48,7 +55,9 @@
         </tbody>
 
     </table>
+
 </div>
+{%endif%}
 
 {% with messages = get_flashed_messages() %}
 {% if messages %}
