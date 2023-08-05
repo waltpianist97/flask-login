@@ -1,9 +1,9 @@
 import os
 import urllib
 import requests
-from flask import Flask, redirect, request, url_for, session
-from app import app, db
-from flask_login import current_user, login_user, logout_user, login_required
+from flask import redirect, request, url_for, session, flash
+from app import app
+from flask_login import login_required
 
 
 def authorize_url():
@@ -42,5 +42,11 @@ def authorization_successful():
         "grant_type": "authorization_code"
     }
     r = requests.post("https://www.strava.com/oauth/token", params)
-    session['strava_token'] = r.json()["access_token"]
+
+    response = r.json()
+    if "access_token" in response.keys():
+        session['strava_token'] = response["access_token"]
+        flash("Profilo teamUp connesso all'account Strava con successo!")
+    else:
+        flash("Autorizzazione negata per la connessione a Strava!")
     return redirect(url_for("user_profile"))
