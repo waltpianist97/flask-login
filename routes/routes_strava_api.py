@@ -9,9 +9,9 @@ from flask_login import current_user, login_user, logout_user, login_required
 def authorize_url():
     """Generate authorization uri"""
     port = 5000
-    app_url = os.getenv('APP_URL')
+    app_url = os.environ.get('APP_URL')
     params = {
-        "client_id": os.getenv('STRAVA_CLIENT_ID'),
+        "client_id": os.environ.get('STRAVA_CLIENT_ID'),
         "response_type": "code",
         "redirect_uri": f"{app_url}:{port}/authorization_successful",
         "scope": "read,profile:read_all,activity:read",
@@ -36,8 +36,8 @@ def authorize():
 def authorization_successful():
     """Exchange code for a user token"""
     params = {
-        "client_id": os.getenv('STRAVA_CLIENT_ID'),
-        "client_secret": os.getenv('STRAVA_CLIENT_SECRET'),
+        "client_id": os.environ.get('STRAVA_CLIENT_ID'),
+        "client_secret": os.environ.get('STRAVA_CLIENT_SECRET'),
         "code": request.args.get('code'),
         "grant_type": "authorization_code"
     }
