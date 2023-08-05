@@ -113,8 +113,8 @@ body {
     border-radius: 5px;
     overflow-x: auto;
     position: relative;
-    opacity: 0.7;
-    /* Change to relative */
+    opacity: 0.9;
+    color: white
 }
 
 .transparent-box {

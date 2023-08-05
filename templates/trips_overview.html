@@ -39,18 +39,24 @@
             {%for trip in trips_group['trips_by_team']%}
             {%if trip.is_approved%}
             <tr style="background-color: green;">
+                <style>
+                    .approved-text {
+                        color: white;
+                    }
+                </style>
                 {%else%}
             <tr style="background-color: yellow;">
                 {%endif%}
 
-                <td>{{ trip.tripname}}</td>
-                <td>{{ trip.speed }}</td>
-                <td>{{ trip.distance }}</td>
-                <td>{{ trip.elevation }}</td>
-                <td>{{ trip.n_of_partecipants }}</td>
-                <td>{{ trip.recorded_on.strftime("%d/%m/%Y") }}</td>
-                <td>{{ trip.prestige }}</td>
-                <td><strong>{{ trip.score }}</strong></td>
+                <td {% if trip.is_approved %}class="approved-text" {% endif %}>{{ trip.tripname }}</td>
+                <td {% if trip.is_approved %}class="approved-text" {% endif %}>{{ trip.speed }}</td>
+                <td {% if trip.is_approved %}class="approved-text" {% endif %}>{{ trip.distance }}</td>
+                <td {% if trip.is_approved %}class="approved-text" {% endif %}>{{ trip.elevation }}</td>
+                <td {% if trip.is_approved %}class="approved-text" {% endif %}>{{ trip.n_of_partecipants }}</td>
+                <td {% if trip.is_approved %}class="approved-text" {% endif %}>{{ trip.recorded_on.strftime("%d/%m/%Y")
+                    }}</td>
+                <td {% if trip.is_approved %}class="approved-text" {% endif %}>{{ trip.prestige }}</td>
+                <td {% if trip.is_approved %}class="approved-text" {% endif %}><strong>{{ trip.score }}</strong></td>
                 <td><a href="{{url_for('edit_trip',trip_id=trip.id,user_id=current_user.id)}}"><i
                             class="fas fa-edit"></i></a>
                     <a href="{{ url_for('delete_trip', trip_id=trip.id, user_id=current_user.id) }}"><i
