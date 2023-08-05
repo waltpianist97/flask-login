@@ -206,8 +206,11 @@ def strava_synch():
 @app.route('/trips_from_strava', methods=["GET", "POST"])
 @login_required
 def trips_from_strava():
-    strava_client = StravaIO(access_token=session.get('strava_token', None))
-    if strava_client:
+
+    strava_token = session.get('strava_token', None)
+    if strava_token:
+        strava_client = StravaIO(
+            access_token=strava_token)
         activities = strava_client.get_logged_in_athlete_activities()
         existing_strava_ids = [
             trip.strava_id for trip in current_user.get_trips()]
