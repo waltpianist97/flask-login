@@ -188,6 +188,9 @@
             <li><a class="dropdown-item" href="{{url_for('manage_team',team_id=team.id)}}">Gestisci squadra</a></li>
             <li><a class="dropdown-item" href="{{url_for('manage_trips',team_id=team.id)}}">Gestisci giri</a></li>
             {%endif%}
+            {%if role=="deputy"%}
+            <li><a class="dropdown-item" href="{{url_for('manage_trips',team_id=team.id)}}">Gestisci giri</a></li>
+            {%endif%}
         </ul>
     </div>
     <script>

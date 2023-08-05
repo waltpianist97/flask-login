@@ -27,7 +27,7 @@
                 <th><strong>Data</strong></th>
                 <th><strong>Prestigio</strong></th>
                 <th><strong>Punteggio</strong></th>
-                {%if role=='team_leader'%}
+                {%if role in ['team_leader','deputy’]%}
 
                 <th><strong>Azioni</strong></th>
                 {%endif%}
@@ -46,7 +46,7 @@
                 <td>{{ trip.recorded_on.strftime("%d/%m/%Y") }}</td>
                 <td>{{ trip.prestige }}</td>
                 <td><strong>{{ trip.score }}</strong></td>
-                {%if role=='team_leader'%}
+                {%if role in ['team_leader','deputy’]%}
                 <td>
 
                     <a href="{{url_for('edit_trip',trip_id=trip.id,user_id=current_user.id)}}"><i

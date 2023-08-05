@@ -213,6 +213,11 @@ class Team(db.Model):
             TeamUserAssociation.team_id == self.id, TeamUserAssociation.role == "team_leader").all()
         return leaders
 
+    def get_deputies(self):
+        deputies = User.query.join(TeamUserAssociation).filter(
+            TeamUserAssociation.team_id == self.id, TeamUserAssociation.role == "deputy").all()
+        return deputies
+
     def create_pictures_folder(self):
         current_file_path = os.path.realpath(__file__)
         parent_folder = os.path.dirname(os.path.dirname(current_file_path))
