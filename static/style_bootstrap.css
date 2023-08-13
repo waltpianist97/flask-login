@@ -117,6 +117,15 @@ body {
     color: white
 }
 
+.scrollable-table {
+    max-height: 200px;
+    /* Adjust the max height as needed */
+    overflow-y: auto;
+    /* Enable vertical scrolling */
+    overflow-x: auto;
+    /* Enable horizontal scrolling */
+}
+
 .transparent-box {
     display: flex;
     justify-content: center;
