@@ -104,7 +104,7 @@
                 <td>{{ form.team_picture() }}
 
 
-                    {% if form.team_picture.data %}
+                    {% if form.team_picture.data and role=="team_leader" %}
                     <button>
                         <a style="color:black"
                             href="{{url_for('delete_file',target='teams',file_db_column='team_picture',filepath=form.team_picture.data,team_id=team.id)}}">Elimina</a>
@@ -118,7 +118,7 @@
                 <td>{{ form.team_background.label }}</td>
                 <td>{{ form.team_background() }}
 
-                    {% if form.team_background.data %}
+                    {% if form.team_background.data and role=="team_leader" %}
                     <button>
                         <a style="color:black"
                             href="{{url_for('delete_file',target='teams',file_db_column='team_background',filepath=form.team_background.data,team_id=team.id)}}">Elimina</a>
@@ -130,7 +130,7 @@
             <tr>
                 <td>{{ form.team_banner.label }}</td>
                 <td>{{ form.team_banner() }}
-                    {% if form.team_banner.data %}
+                    {% if form.team_banner.data and role=="team_leader"%}
                     <button>
                         <a style="color:black"
                             href="{{url_for('delete_file',target='teams',file_db_column='team_banner',filepath=form.team_banner.data,team_id=team.id)}}">Elimina</a>
@@ -144,7 +144,7 @@
                 <td>{{ form.team_motto.label }}</td>
                 <td>{{ form.team_motto() }}
 
-                    {% if form.team_motto.data %}
+                    {% if form.team_motto.data and role=="team_leader" %}
                     <button>
                         <a style="color:black"
                             href="{{url_for('delete_file',target='teams',file_db_column='team_motto',filepath=form.team_motto.data,team_id=team.id)}}">Elimina</a>
