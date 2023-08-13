@@ -108,10 +108,17 @@
                             {% if team_role["team_role"] == "user" %}
                             <option value="user" selected>Membro</option>
                             <option value="team_leader">Team Leader</option>
+                            <option value="deputy">Deputy</option>
+
                             {% elif team_role["team_role"] == "team_leader" %}
                             <option value="user">Membro</option>
-
+                            <option value="deputy">Deputy</option>
                             <option value="team_leader" selected>Team Leader</option>
+
+                            {% elif team_role["team_role"] == "deputy" %}
+                            <option value="user">Membro</option>
+                            <option value="deputy" selected>Deputy</option>
+                            <option value="team_leader">Team Leader</option>
                             {% endif %}
                         </select>
                     </form>

@@ -98,7 +98,7 @@ def new_trip(user_id, team_id=None, act_name=None, act_speed=None, act_distance=
         t_r = TeamUserAssociation.query.filter(and_(
             TeamUserAssociation.user_id == user.id, TeamUserAssociation.team_id == form.team.data)).first().role
 
-        if t_r == "team_leader":
+        if t_r in ["team_leader", "deputy"]:
             trip.is_approved = True
         else:
             trip.is_approved = False
@@ -108,10 +108,12 @@ def new_trip(user_id, team_id=None, act_name=None, act_speed=None, act_distance=
 
         team = Team.query.get(trip.team_id)
 
-        if t_r != "team_leader":
+        if t_r not in ["team_leader", "deputy"]:
             emails_leaders = [tl.email for tl in team.get_leaders()]
+            emails_deputies = [td.email for td in team.get_deputies()]
+
             send_email_utility('Richiesta approvazione giro',
-                               f"{user.username} ha richiesto di registrare il giro: {trip.tripname} per il team {trip.get_team().name}, controlla la tua pagina 'Gestisci giri'!", AUTO_MAIL, emails_leaders)
+                               f"{user.username} ha richiesto di registrare il giro: {trip.tripname} per il team {trip.get_team().name}, controlla la tua pagina 'Gestisci giri'!", AUTO_MAIL, emails_leaders+emails_deputies)
         else:
             other_members_emails = [
                 user.email for user in team.users if trip.get_user() != user]
@@ -201,7 +203,7 @@ def edit_trip(trip_id, user_id):
         _ = trip_team.ranking_builder()
 
         my_role_in_team = current_user.get_role_in_team(trip.team_id)
-        if my_role_in_team == "team_leader":
+        if my_role_in_team in ["team_leader", "deputy"]:
             return redirect(url_for('manage_trips', team_id=trip.team_id))
         else:
             return redirect(url_for('trips_overview', user_id=current_user.id))

@@ -39,7 +39,16 @@
                         </ul>
                     </div>
                 </div>
+                {%elif current_user in team.get_deputies() %}
 
+                <div class="home-button-menu">
+                    <a href="{{ url_for('team_home', team_id=team.id) }}">{{ team.name }}</a>
+                    <div class="sublist-home">
+                        <ul>
+                            <li><a href="{{ url_for('manage_trips', team_id=team.id) }}">Gestisci giri</a></li>
+                        </ul>
+                    </div>
+                </div>
 
                 {%else%}
                 <a class="home-button" href="{{ url_for('team_home', team_id=team.id) }}">{{ team.name }}</a>

@@ -33,6 +33,7 @@
             <li><a class="dropdown-item" href="{{url_for('manage_team',team_id=team.id)}}">Gestisci squadra</a></li>
             <li><a class="dropdown-item" href="{{url_for('manage_trips',team_id=team.id)}}">Gestisci giri</a></li>
             {%endif%}
+
         </ul>
     </div>
     <script>
@@ -103,10 +104,16 @@
                         <select name="role" onchange="this.form.submit()">
                             {% if team_member['role'] =='user'%}
                             <option value="user" selected>Membro</option>
+                            <option value="deputy">Deputy</option>
                             <option value="team_leader">Leader</option>
                             {%elif team_member['role'] == 'team_leader'%}
-                            <option value="team_leader" selected>Leader</option>
                             <option value="user">Membro</option>
+                            <option value="deputy">Deputy</option>
+                            <option value="team_leader" selected>Leader</option>
+                            {%elif team_member['role'] == 'deputy'%}
+                            <option value="user">Membro</option>
+                            <option value="deputy" selected>Deputy</option>
+                            <option value="team_leader">Leader</option>
                             {% endif %}
                         </select>
                     </form>
