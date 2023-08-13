@@ -107,7 +107,7 @@
             <li class="dropdown subitem">
                 <a class="dropdown-item dropdown-toggle" href="#" role="button" id="squadreMenu">Squadre</a>
                 <ul class="dropdown-menu" aria-labelledby="squadreMenu">
-                    {% for team in teams %}
+                    {% for team in current_user.teams %}
                     <li><a class="dropdown-item" href="{{url_for('team_home',team_id=team.id)}}">{{team.name}}</a></li>
                     {% endfor %}
                 </ul>

@@ -414,24 +414,6 @@ def run_server_and_wait_for_token(port, client_id, client_secret):
         return data
 
 
-"""
-def get_strava_access_token(client_id, client_secret):
-    authorization_code = request.args.get('code')
-    params = {
-        "client_id": client_id,
-        "client_secret": client_secret,
-        "code": authorization_code,
-        "grant_type": "authorization_code"
-    }
-
-    token_url = "https://www.strava.com/oauth/token"
-    response = requests.post(token_url, params=params)
-    data = response.json()
-
-    return data
-"""
-
-
 def convert_datetime_to_iso8601(d):
     for k, v in d.items():
         if isinstance(v, dict):
