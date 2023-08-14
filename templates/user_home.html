@@ -11,12 +11,12 @@
 </style>
 {%endif%}
 
-<div class="table-box" style="display: inline-block;">
+<div class="table-box" style="display: inline-block; margin-bottom: 5px;">
     <h1 style="color:red; text-align: center;">Bentornato {{current_user.username}}!</h1>
 </div>
 {% for trip in last_trips %}
-<div class="table-box" style="display: inline-block;">
-    <table class="table table-striped">
+<div class="table-box" style="display: inline-block; margin-bottom:5px; margin-top: 5px;">
+    <table class="table table-striped" style="padding-bottom:0px">
         <thead>
             <th><strong>Giro</strong></th>
             <th><strong>Team</strong></th>

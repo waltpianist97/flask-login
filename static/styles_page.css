@@ -193,7 +193,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    opacity: 0.75;
     border-radius: 10px;
 
 }
@@ -393,8 +392,8 @@ body {
     border-radius: 10px;
     padding: 20px;
     width: fit-content;
-    margin: 30 auto;
     opacity: 0.75;
+
 }
 
 .login-table table {
