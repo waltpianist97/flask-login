@@ -267,10 +267,16 @@ def forgot_password():
         if not user_recover:
             flash(f"Non esiste alcun \'{username}\' registrato nel sistema!")
             return redirect(url_for('login'))
+        
+        #if the password_reset_requests contains one request, clean up
+        if password_reset_requests:
+            password_reset_requests.clear()
 
         email = user_recover.email
         # Generate a unique token
         token = secrets.token_hex(16)
+
+
         # Store the token in the temporary database
         password_reset_requests[token] = {
             'email': email, 'timestamp': datetime.now()}

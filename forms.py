@@ -22,7 +22,7 @@ class RegistrationForm(FlaskForm):
                                                                                             una lettera maiuscola, una minuscola, una cifra ed un carattere speciale (@$!%*?&)')])
 
     password2 = PasswordField(
-        'Ripeti Password', validators=[DataRequired(), EqualTo('password')])
+        'Ripeti Password', validators=[DataRequired(), EqualTo('password',"Le password non coincidono!")])
     submit = SubmitField('Registrati')
 
 class LoginForm(FlaskForm):
@@ -36,11 +36,11 @@ class ForgotPasswordForm(FlaskForm):
     submit = SubmitField('Invia email')
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8), Regexp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', \
+    password = PasswordField('Password', validators=[DataRequired("Inserire la password!"), Length(min=8,message=""), Regexp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$', \
                                                                                             message='La password deve contenere almeno 8 caratteri, di cui almeno\
                                                                                             una lettera maiuscola, una minuscola, una cifra ed un carattere speciale (@$!%*?&)')])
     password2 = PasswordField(
-        'Ripeti Password', validators=[DataRequired(), EqualTo('password')])
+        'Ripeti Password', validators=[DataRequired("Inserire la password!"), EqualTo('password',"Le password non coincidono!")])
     submit = SubmitField('Reset password')
 
 class NewTripForm(FlaskForm):
